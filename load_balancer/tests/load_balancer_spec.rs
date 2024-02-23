@@ -1,5 +1,5 @@
+use load_balancer::domain::models::Targets;
 use load_balancer::startup;
-use load_balancer::targets::models::Targets;
 use std::sync::{Arc, Mutex};
 use tokio::net::TcpListener;
 use uuid::Uuid;
@@ -30,7 +30,7 @@ async fn spawn_server() -> std::io::Result<TestServer> {
 
     let name_2 = name.clone();
     tokio::task::spawn(async move {
-        server::startup::run(listener, &name_2)
+        server::startup::run(listener, name_2)
             .await
             .expect("Failed to start server");
     });
@@ -54,7 +54,7 @@ async fn spawn_app() -> Result<TestApp, Box<dyn std::error::Error>> {
     let server_a_address = format!("{}:{}", &test_server.address, test_server.port);
 
     let targets = Arc::new(Mutex::new(
-        Targets::from_strings(vec![server_a_address]).expect("Failed to init targets"),
+        Targets::from_strings(vec![server_a_address]).expect("Failed to init domain"),
     ));
 
     tokio::task::spawn(async move {

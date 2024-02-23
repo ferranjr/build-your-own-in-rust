@@ -17,7 +17,7 @@ async fn spawn_app() -> Result<TestApp, Box<dyn std::error::Error>> {
     println!("Starting app at port {}", &port);
 
     tokio::task::spawn(async move {
-        startup::run(listener, &"R2D2".to_string())
+        startup::run(listener, "R2D2".to_string())
             .await
             .expect("Failed to start server");
     });

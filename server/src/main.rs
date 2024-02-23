@@ -11,12 +11,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
 
     let srv1 = async move {
         let listener = TcpListener::bind(address1).await?;
-        startup::run(listener, &"R2D2".to_string()).await
+        startup::run(listener, "R2D2".to_string()).await
     };
 
     let srv2 = async move {
         let listener = TcpListener::bind(address2).await?;
-        startup::run(listener, &"Chewbacca".to_string()).await
+        startup::run(listener, "Chewbacca".to_string()).await
     };
 
     println!("Listening on http://{} and http://{}", address1, address2);

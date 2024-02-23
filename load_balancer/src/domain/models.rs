@@ -17,17 +17,21 @@ impl Targets {
             curr: 0,
         })
     }
+}
 
-    pub fn next(&mut self) -> SocketAddr {
-        let socket_address = self.uris.get(self.curr).unwrap();
+impl Iterator for Targets {
+    type Item = SocketAddr;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let socket_address = self.uris.get(self.curr);
         self.curr = (self.curr + 1) % self.uris.len();
-        *socket_address
+        socket_address.copied()
     }
 }
 
 #[cfg(test)]
 mod test {
-    use crate::targets::models::Targets;
+    use crate::domain::models::Targets;
     use std::net::SocketAddr;
 
     #[test]
@@ -37,7 +41,7 @@ mod test {
             "127.0.0.1:8082".to_string(),
         ]);
         assert!(targets.is_ok());
-        let targets = targets.expect("Failed to resolve targets");
+        let targets = targets.expect("Failed to resolve domain");
         assert_eq!(targets.uris.len(), 2);
     }
 
@@ -54,15 +58,15 @@ mod test {
             curr: 0,
         };
 
-        let addr = targets.next();
+        let addr = targets.next().unwrap();
         assert_eq!(addr, address1);
         assert_eq!(targets.curr, 1);
 
-        let addr = targets.next();
+        let addr = targets.next().unwrap();
         assert_eq!(addr, address2);
         assert_eq!(targets.curr, 0);
 
-        let addr = targets.next();
+        let addr = targets.next().unwrap();
         assert_eq!(addr, address1);
         assert_eq!(targets.curr, 1);
     }

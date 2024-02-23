@@ -8,7 +8,7 @@ use tokio::net::TcpListener;
 
 pub async fn run(
     tcp_listener: TcpListener,
-    name: &String,
+    name: String,
 ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     println!(
         "Starting server at: {}:{}",
@@ -24,7 +24,7 @@ pub async fn run(
         tokio::task::spawn(async move {
             if let Err(err) = http1::Builder::new()
                 // `service_fn` converts our function in a `Service`
-                .serve_connection(io, service_fn(|r| request_handler(r, &name)))
+                .serve_connection(io, service_fn(|r| request_handler(r, name.as_str())))
                 .await
             {
                 println!("Error serving connection: {:?}", err);
@@ -35,7 +35,7 @@ pub async fn run(
 
 async fn request_handler(
     req: Request<hyper::body::Incoming>,
-    name: &String,
+    name: &str,
 ) -> Result<Response<BoxBody<Bytes, hyper::Error>>, hyper::Error> {
     match (req.method(), req.uri().path()) {
         (&Method::GET, "/") => Ok(Response::new(full(format!("Hello from server {}", name)))),
