@@ -1,4 +1,5 @@
 use domain::models::Targets;
+use load_balancer::configuration::get_configuration;
 use std::sync::{Arc, Mutex};
 use tokio::net::TcpListener;
 
@@ -8,12 +9,11 @@ mod startup;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let address = format!("{}:{}", "127.0.0.1", 8080);
+    let settings = get_configuration().expect("Unable to load configuration");
+    let address = format!("{}:{}", "127.0.0.1", settings.application.port);
     let listener = TcpListener::bind(address).await?;
-    let targets: Arc<Mutex<Targets>> = Arc::new(Mutex::new(
-        Targets::from_strings(vec!["127.0.0.1:8081".into(), "127.0.0.1:8082".into()])
-            .expect("Failed to init domain"),
-    ));
+    let targets: Arc<Mutex<Targets>> =
+        Arc::new(Mutex::new(Targets::new(settings.application.targets)));
 
     startup::run(listener, targets).await
 }

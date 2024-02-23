@@ -51,11 +51,11 @@ async fn spawn_app() -> Result<TestApp, Box<dyn std::error::Error>> {
     println!("Starting app at port {}", &port);
 
     let test_server = spawn_server().await.expect("Failed to start server");
-    let server_a_address = format!("{}:{}", &test_server.address, test_server.port);
+    let server_a_address = format!("{}:{}", &test_server.address, test_server.port)
+        .parse()
+        .expect("Failed to create SocketAddr");
 
-    let targets = Arc::new(Mutex::new(
-        Targets::from_strings(vec![server_a_address]).expect("Failed to init domain"),
-    ));
+    let targets = Arc::new(Mutex::new(Targets::new(vec![server_a_address])));
 
     tokio::task::spawn(async move {
         startup::run(listener, targets)
