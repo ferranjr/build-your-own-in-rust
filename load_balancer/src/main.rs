@@ -1,11 +1,9 @@
-use domain::models::Targets;
 use load_balancer::configuration::get_configuration;
-use std::sync::{Arc, Mutex};
+use load_balancer::domain::models::Targets;
+use load_balancer::startup;
+use std::sync::Arc;
 use tokio::net::TcpListener;
-
-mod domain;
-mod proxy;
-mod startup;
+use tokio::sync::Mutex;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

@@ -1,7 +1,8 @@
 use load_balancer::domain::models::Targets;
 use load_balancer::startup;
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 use tokio::net::TcpListener;
+use tokio::sync::Mutex;
 use uuid::Uuid;
 
 #[derive(Debug)]
@@ -41,6 +42,7 @@ async fn spawn_server() -> std::io::Result<TestServer> {
         name,
     })
 }
+
 async fn spawn_app() -> Result<TestApp, Box<dyn std::error::Error>> {
     let address = format!("{}:{}", "127.0.0.1", 0);
     let listener = TcpListener::bind(address).await?;
