@@ -1,5 +1,6 @@
 use load_balancer::configuration::get_configuration;
 use load_balancer::domain::models::Targets;
+use load_balancer::healthchecks::healthchecker::HealthChecker;
 use load_balancer::startup;
 use std::sync::Arc;
 use tokio::net::TcpListener;
@@ -13,5 +14,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let targets: Arc<Mutex<Targets>> =
         Arc::new(Mutex::new(Targets::new(settings.application.targets)));
 
+    // Initialises the monitoring of targets
+    HealthChecker::init(Arc::clone(&targets)).await;
+
+    // Initialise the server
     startup::run(listener, targets).await
 }

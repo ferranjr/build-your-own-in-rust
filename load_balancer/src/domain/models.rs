@@ -1,7 +1,6 @@
 use std::net::SocketAddr;
 use std::sync::Arc;
 use tokio::sync::Mutex;
-use crate::healthchecker::healthchecker::Healthchecker;
 
 #[derive(Debug)]
 pub struct Server {
@@ -11,15 +10,10 @@ pub struct Server {
 
 impl Server {
     pub fn new(uri: SocketAddr) -> Server {
-        Server {
-            uri,
-            healthy: true,
-        }
+        Server { uri, healthy: true }
     }
 
-    pub fn check_status_address(
-        &self
-    ) -> String {
+    pub fn check_status_address(&self) -> String {
         format!("http://{}/private/status", &self.uri.to_string())
     }
 }
@@ -37,15 +31,10 @@ impl Targets {
             .map(|uri| {
                 Arc::new(Mutex::new(Server {
                     uri,
-                    healthy: true
+                    healthy: false,
                 }))
             })
             .collect();
-
-        for server in servers.iter() {
-            let server = Arc::clone(server);
-            tokio::spawn(Healthchecker::healthcheck(server));
-        }
 
         Targets { servers, curr: 0 }
     }
@@ -71,9 +60,10 @@ impl Targets {
 mod test {
     use crate::domain::models::Targets;
     use std::net::SocketAddr;
+    use std::sync::Arc;
 
-    #[tokio::test]
-    async fn targets_new_should_init_struct_correctly() {
+    #[test]
+    fn targets_new_should_init_struct_correctly() {
         let address1: SocketAddr = "127.0.0.1:8081"
             .parse()
             .expect("Failed to parse socket addr");
@@ -88,7 +78,7 @@ mod test {
     }
 
     #[tokio::test]
-    async fn targets_next_should_return_address_in_round_robin_manner() {
+    async fn targets_next_should_return_address_in_round_robin_manner_when_multiple_healthy() {
         let address1: SocketAddr = "127.0.0.1:8081"
             .parse()
             .expect("Failed to parse socket addr");
@@ -96,6 +86,10 @@ mod test {
             .parse()
             .expect("Failed to parse socket addr");
         let mut targets = Targets::new(vec![address1, address2]);
+        for s in targets.servers.iter() {
+            let server = Arc::clone(&s);
+            server.lock().await.healthy = true;
+        }
 
         let addr = targets.next_available_server().await;
         assert_eq!(addr, address1);

@@ -11,7 +11,6 @@ Currently, using:
  - [x] Load Balancer running on port 8080
  - [x] Load Balancer using Round robin to redirect calls
  - [x] Load Balancer to keep track of servers health
- - [ ] Healthcheck logic missing tests
  - [ ] Improve set up to start servers using CLI or docker so makes manual testing more flexible
  - [ ] Pack LB and add docker-compose
  - [ ] Improve error handling
