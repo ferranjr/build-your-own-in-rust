@@ -24,7 +24,11 @@ async fn spawn_app() -> Result<TestApp, Box<dyn std::error::Error>> {
             .expect("Failed to start server");
     });
 
-    Ok(TestApp { address, port, name: name.to_string() })
+    Ok(TestApp {
+        address,
+        port,
+        name: name.to_string(),
+    })
 }
 
 #[tokio::test]
@@ -64,22 +68,14 @@ async fn server_root_path_should_show_the_server_name() {
     let client = reqwest::Client::new();
 
     let response = client
-        .get(format!(
-            "http://{}:{}/",
-            &app.address, &app.port
-        ))
+        .get(format!("http://{}:{}/", &app.address, &app.port))
         .send()
         .await
         .expect("Failed to execute request");
 
     assert_eq!(response.status().as_u16(), 200);
 
-    let content = response.text()
-        .await
-        .expect("Failed to extract content.");
+    let content = response.text().await.expect("Failed to extract content.");
 
-    assert_eq!(
-        format!("Hello from server {}", &app.name),
-        content
-    )
+    assert_eq!(format!("Hello from server {}", &app.name), content)
 }
