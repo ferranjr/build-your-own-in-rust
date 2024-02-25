@@ -1,0 +1,35 @@
+version: '3.9'
+name: "load-balancer"
+
+services:
+
+  server_a:
+    build: server/.
+    image: localhost/server:latest
+    ports:
+      - "8081:8081"
+    environment:
+      - SERVER_NAME=R2D2
+
+  server_b:
+    build: server/.
+    image: localhost/server:latest
+    ports:
+      - "8082:8081"
+    environment:
+      - SERVER_NAME=Chewbacca
+
+  server_c:
+    build: server/.
+    image: localhost/server:latest
+    ports:
+      - "8083:8081"
+    environment:
+      - SERVER_NAME=C3P0
+
+# TODO: Loading config specific for docker-compose, so I can run all here
+#  load_balancer:
+#    build: load_balancer/.
+#    image: localhost/load_balancer:latest
+#    ports:
+#      - "8080:8080"

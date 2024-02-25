@@ -9,7 +9,7 @@ use tokio::sync::Mutex;
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let settings = get_configuration().expect("Unable to load configuration");
-    let address = format!("{}:{}", "127.0.0.1", settings.application.port);
+    let address = format!("{}:{}", "0.0.0.0", settings.application.port);
     let listener = TcpListener::bind(address).await?;
     let targets: Arc<Mutex<Targets>> =
         Arc::new(Mutex::new(Targets::new(settings.application.targets)));

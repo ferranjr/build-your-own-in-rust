@@ -1,26 +1,19 @@
-use futures_util::future::join;
 use server::startup;
+use std::env;
 use std::net::SocketAddr;
 use tokio::net::TcpListener;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    let address1: SocketAddr = ([127, 0, 0, 1], 8081).into();
-    let address2: SocketAddr = ([127, 0, 0, 1], 8082).into();
+    let server_name = env::var("SERVER_NAME").map_or("R2D2".to_string(), |s| s.to_string());
 
-    let srv1 = async move {
-        let listener = TcpListener::bind(address1).await?;
-        startup::run(listener, "R2D2".to_string()).await
-    };
+    let address1: SocketAddr = ([0, 0, 0, 0], 8081).into();
+    let listener = TcpListener::bind(address1).await?;
+    startup::run(listener, server_name)
+        .await
+        .expect("Unable to start the server");
 
-    let srv2 = async move {
-        let listener = TcpListener::bind(address2).await?;
-        startup::run(listener, "Chewbacca".to_string()).await
-    };
-
-    println!("Listening on http://{} and http://{}", address1, address2);
-
-    let _ = join(srv1, srv2).await;
+    println!("Listening on http://{}", address1);
 
     Ok(())
 }
