@@ -1,8 +1,7 @@
 use futures_util::future::join;
 use std::net::SocketAddr;
 use tokio::net::TcpListener;
-
-mod startup;
+use server::startup;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
