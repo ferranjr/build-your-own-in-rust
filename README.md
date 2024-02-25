@@ -15,3 +15,31 @@ Currently, using:
  - [ ] Pack LB and add docker-compose
  - [ ] Improve error handling
  - [ ] Use tracing/logging
+
+# Running Locally
+Running server/main.rs starts 2 servers at ports 8081 and 8082
+```shell
+cargo run --bin server
+```
+You can curl the servers to see the different messages on root path
+```shell
+curl http://127.0.0.1:8081/
+curl http://127.0.0.1:8082/
+```
+Running the load_balancer/main.rs will set the LB pointing to those 2 servers.
+```shell
+cargo run --bin load_balancer
+```
+After that, curl to the load balancer will alternate between the two servers following Round Robin algorithm.
+```shell
+curl http://127.0.0.1:8080/
+```
+Sample output:
+```
+➜ curl http://127.0.0.1:8080/  
+Hello from server R2D2%                                                                                                                                                                        ➜  load_balancer git:(main) ✗ curl http://127.0.0.1:8080/
+➜ curl http://127.0.0.1:8080/  
+Hello from server Chewbacca%                                                                                                                                                                        ➜  load_balancer git:(main) ✗ curl http://127.0.0.1:8080/
+➜ curl http://127.0.0.1:8080/  
+Hello from server R2D2%    
+```
