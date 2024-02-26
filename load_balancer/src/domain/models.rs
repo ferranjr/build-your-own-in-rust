@@ -1,6 +1,6 @@
 use std::net::SocketAddr;
 use std::sync::Arc;
-use tokio::sync::Mutex;
+use tokio::sync::RwLock;
 
 #[derive(Debug)]
 pub struct Server {
@@ -20,7 +20,7 @@ impl Server {
 
 #[derive(Debug)]
 pub struct Targets {
-    pub servers: Vec<Arc<Mutex<Server>>>,
+    pub servers: Vec<Arc<RwLock<Server>>>,
     pub curr: usize,
 }
 
@@ -29,7 +29,7 @@ impl Targets {
         let servers: Vec<_> = uris
             .into_iter()
             .map(|uri| {
-                Arc::new(Mutex::new(Server {
+                Arc::new(RwLock::new(Server {
                     uri,
                     healthy: false,
                 }))
@@ -43,7 +43,7 @@ impl Targets {
         let mut index = self.curr;
         for _ in 0..self.servers.len() {
             let server = self.servers[index].clone();
-            let server = server.lock().await;
+            let server = server.read().await;
 
             if server.healthy {
                 self.curr = (self.curr + 1) % self.servers.len();
@@ -52,7 +52,7 @@ impl Targets {
 
             index = (index + 1) % self.servers.len();
         }
-        self.servers[index].clone().lock().await.uri
+        self.servers[index].clone().read().await.uri
     }
 }
 
@@ -88,7 +88,7 @@ mod test {
         let mut targets = Targets::new(vec![address1, address2]);
         for s in targets.servers.iter() {
             let server = Arc::clone(&s);
-            server.lock().await.healthy = true;
+            server.write().await.healthy = true;
         }
 
         let addr = targets.next_available_server().await;

@@ -1,7 +1,7 @@
 use crate::domain::models::{Server, Targets};
 use std::sync::Arc;
 use std::time::Duration;
-use tokio::sync::Mutex;
+use tokio::sync::{Mutex, RwLock};
 use tokio::time;
 
 pub struct HealthChecker {}
@@ -15,10 +15,10 @@ impl HealthChecker {
         }
     }
 
-    pub async fn healthcheck(server: Arc<Mutex<Server>>) {
+    pub async fn healthcheck(server: Arc<RwLock<Server>>) {
         loop {
             let result = {
-                let address = server.lock().await.check_status_address();
+                let address = server.read().await.check_status_address();
                 reqwest::Client::builder()
                     .timeout(Duration::from_millis(500))
                     .build()
@@ -28,7 +28,7 @@ impl HealthChecker {
                     .await
             };
 
-            let mut server = server.lock().await;
+            let mut server = server.write().await;
             match result {
                 Ok(res) => {
                     server.healthy = res.status().is_success();
