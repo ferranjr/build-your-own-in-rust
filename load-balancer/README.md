@@ -1,4 +1,4 @@
-![General CI](https://github.com/ferranjr/load_balancer/actions/workflows/general.yml/badge.svg)
+![General CI](https://github.com/ferranjr/build-your-own-in-rust/actions/workflows/load-balancer-general.yml/badge.svg)
 
 # Build Your Own Load Balancer
 Inspired by https://codingchallenges.fyi/challenges/challenge-load-balancer/ my ongoing attempt to build a Load Balancer using RUST as a way to learn more about the language and gain some experience.

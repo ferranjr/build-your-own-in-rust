@@ -1,5 +1,5 @@
 # The name of your workflow. GitHub displays the names of your workflows on your repository's "Actions" tab
-name: Load-Balancer
+name: Load Balancer General
 
 on:
   push:
