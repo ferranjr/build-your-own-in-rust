@@ -1,7 +1,13 @@
 # The name of your workflow. GitHub displays the names of your workflows on your repository's "Actions" tab
 name: Load-Balancer
 
-on: [push, pull_request]
+on:
+  push:
+    paths:
+      - 'load-balancer/**'
+  pull_request:
+    paths:
+      - 'load-balancer/**'
 
 env:
   CARGO_TERM_COLOR: always
