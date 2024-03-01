@@ -30,6 +30,8 @@ jobs:
       # A GitHub Action that implements smart caching for rust/cargo projects with sensible defaults.
       - name: Rust Cache Action
         uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: . -> ./load-balancer
 
       - name: Run tests
         run: cargo test
