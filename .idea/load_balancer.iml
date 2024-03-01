@@ -6,8 +6,13 @@
       <sourceFolder url="file://$MODULE_DIR$/load_balancer/tests" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/server/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/server/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/load-balancer/load-balancer/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/load-balancer/load-balancer/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/load-balancer/server/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/load-balancer/server/tests" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/load_balancer/target" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
+      <excludeFolder url="file://$MODULE_DIR$/load-balancer/target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

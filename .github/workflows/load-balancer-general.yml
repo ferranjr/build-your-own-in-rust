@@ -33,6 +33,7 @@ jobs:
 
       - name: Run tests
         run: cargo test
+        working-directory: ./load-balancer
 
   # `fmt` container job
   fmt:
@@ -46,6 +47,7 @@ jobs:
           components: rustfmt
       - name: Enforce formatting
         run: cargo fmt --check
+        working-directory: ./load-balancer
 
   # `clippy` container job
   clippy:
@@ -60,6 +62,7 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - name: Linting
         run: cargo clippy -- -D warnings
+        working-directory: ./load-balancer
 
   # `coverage` container job
   coverage:
@@ -71,3 +74,4 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - name: Generate code coverage
         run: cargo install cargo-tarpaulin && cargo tarpaulin --verbose --workspace
+        working-directory: ./load-balancer

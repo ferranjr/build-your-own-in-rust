@@ -32,7 +32,7 @@ curl http://127.0.0.1:8083/
 ```
 Running the load_balancer/main.rs will set the LB pointing to those 2 servers.
 ```shell
-cargo run --bin load_balancer
+cargo run --bin load-balancer
 ```
 After that, curl to the load balancer will alternate between the two servers following Round Robin algorithm.
 ```shell

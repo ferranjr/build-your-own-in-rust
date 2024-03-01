@@ -15,7 +15,7 @@ pub struct ApplicationSettings {
 
 pub fn get_configuration() -> Result<Settings, config::ConfigError> {
     let base_path = std::env::current_dir().expect("Failed to determine the current directory");
-    let configuration_directory = base_path.join("load_balancer/configuration");
+    let configuration_directory = base_path.join("load-balancer/configuration");
 
     let settings = config::Config::builder()
         .add_source(config::File::from(
