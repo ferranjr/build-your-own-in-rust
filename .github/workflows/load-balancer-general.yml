@@ -31,7 +31,7 @@ jobs:
       - name: Rust Cache Action
         uses: Swatinem/rust-cache@v2
         with:
-          workspaces: . -> ./load-balancer
+          workspaces: . -> load-balancer
 
       - name: Run tests
         run: cargo test
@@ -62,6 +62,8 @@ jobs:
         with:
           components: clippy
       - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: . -> load-balancer
       - name: Linting
         run: cargo clippy -- -D warnings
         working-directory: ./load-balancer
