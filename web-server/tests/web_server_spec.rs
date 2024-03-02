@@ -37,12 +37,12 @@ async fn server_should_listen_for_connections() {
 }
 
 #[tokio::test]
-async fn server_should_respond_with_path() {
+async fn server_should_respond_with_index_html_if_specified() {
     let app = spawn_app().await.expect("Failed to start the app");
     let client = reqwest::Client::new();
 
     let response = client
-        .get(format!("http://{}:{}/aloha", &app.address, &app.port))
+        .get(format!("http://{}:{}/index.html", &app.address, &app.port))
         .send()
         .await
         .expect("Failed to execute request");
@@ -54,11 +54,11 @@ async fn server_should_respond_with_path() {
         .text()
         .await
         .expect("Failed to extract response content.");
-    assert_eq!("Requested path: /aloha".to_string(), content);
+    assert!(content.contains("My web server served this page"));
 }
 
 #[tokio::test]
-async fn server_should_respond_with_root_path() {
+async fn server_should_respond_with_index_html_if_not_specified() {
     let app = spawn_app().await.expect("Failed to start the app");
     let client = reqwest::Client::new();
 
@@ -75,7 +75,7 @@ async fn server_should_respond_with_root_path() {
         .text()
         .await
         .expect("Failed to extract response content.");
-    assert_eq!("Requested path: /".to_string(), content);
+    assert!(content.contains("My web server served this page"));
 }
 
 #[tokio::test]

@@ -2,6 +2,7 @@ use crate::domain::http_request::{HttpRequest, Method};
 use crate::domain::http_response::{HttpResponse, StatusCodes};
 use std::io::{BufRead, BufReader, Write};
 use std::net::{TcpListener, TcpStream};
+use std::path::Path;
 
 pub fn run_server(listener: TcpListener) -> std::io::Result<()> {
     let address = listener.local_addr().unwrap();
@@ -32,9 +33,20 @@ fn handle_client(mut stream: TcpStream) -> std::io::Result<()> {
 }
 
 fn handle_request(method: Method, path: String) -> std::io::Result<HttpResponse> {
-    let content = format!("Requested path: {}", path);
     match (method, path) {
-        (Method::GET, _) => Ok(HttpResponse::new(StatusCodes::OK, Some(content))),
+        (Method::GET, path) => match load_file(path) {
+            Ok(content) => Ok(HttpResponse::new(StatusCodes::OK, Some(content))),
+            Err(_) => Ok(HttpResponse::new(StatusCodes::NotFound, None)),
+        },
         (_, _) => Ok(HttpResponse::new(StatusCodes::NotFound, None)),
+    }
+}
+
+fn load_file(path: String) -> std::io::Result<String> {
+    let final_path = std::env::current_dir()?.join(Path::new(&format!("www{}", path)));
+    if final_path.is_file() {
+        std::fs::read_to_string(final_path)
+    } else {
+        std::fs::read_to_string(final_path.join("index.html"))
     }
 }
