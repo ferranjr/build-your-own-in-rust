@@ -26,7 +26,9 @@ async fn handle_client(stream: TcpStream) -> std::io::Result<()> {
 
     let HttpRequest { method, path } = first_line.parse::<HttpRequest>()?;
     let http_response = handle_request(method, path).await?;
-    stream.write_all(http_response.response_string().as_bytes()).await
+    stream
+        .write_all(http_response.response_string().as_bytes())
+        .await
 }
 
 async fn handle_request(method: Method, path: String) -> std::io::Result<HttpResponse> {
