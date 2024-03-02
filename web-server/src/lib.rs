@@ -1,2 +1,2 @@
-pub mod startup;
 pub mod domain;
+pub mod startup;

@@ -2,25 +2,19 @@ use std::fmt::Display;
 
 pub struct HttpResponse {
     status_code: StatusCodes,
-    content: String
+    content: String,
 }
 
 impl HttpResponse {
-    pub fn new(
-        status_code: StatusCodes,
-        content: Option<String>
-    ) -> Self {
+    pub fn new(status_code: StatusCodes, content: Option<String>) -> Self {
         HttpResponse {
             status_code,
-            content: content.unwrap_or("".to_string())
+            content: content.unwrap_or("".to_string()),
         }
     }
 
     pub fn response_string(&self) -> String {
-        let content_length_line = format!(
-            "Content-Length: {}",
-            self.content.len()
-        );
+        let content_length_line = format!("Content-Length: {}", self.content.len());
         format!(
             "HTTP/1.1 {}\r\n{}\r\n\r\n{}\r\n",
             self.status_code, content_length_line, self.content
@@ -28,14 +22,13 @@ impl HttpResponse {
     }
 }
 
-
 pub enum StatusCodes {
     OK,
     Created,
     Accepted,
     NoContent,
     NotFound,
-    InternalServerError
+    InternalServerError,
 }
 
 impl Display for StatusCodes {
@@ -46,7 +39,7 @@ impl Display for StatusCodes {
             StatusCodes::Accepted => "202 Accepted",
             StatusCodes::NoContent => "204 No Content",
             StatusCodes::NotFound => "404 Not Found",
-            StatusCodes::InternalServerError => "500 Internal Server Error"
+            StatusCodes::InternalServerError => "500 Internal Server Error",
         };
         write!(f, "{}", str)
     }
@@ -58,11 +51,11 @@ mod tests {
 
     #[test]
     fn http_response_builds_ok_string() {
-        let str = HttpResponse::new(
-            StatusCodes::OK,
-            Some("Requested path: /foobar".to_string()
-            )
-        ).response_string();
-        assert_eq!(str, "HTTP/1.1 200 OK\r\nContent-Length: 23\r\n\r\nRequested path: /foobar\r\n")
+        let str = HttpResponse::new(StatusCodes::OK, Some("Requested path: /foobar".to_string()))
+            .response_string();
+        assert_eq!(
+            str,
+            "HTTP/1.1 200 OK\r\nContent-Length: 23\r\n\r\nRequested path: /foobar\r\n"
+        )
     }
 }
