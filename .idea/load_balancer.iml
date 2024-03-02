@@ -10,9 +10,12 @@
       <sourceFolder url="file://$MODULE_DIR$/load-balancer/load-balancer/tests" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/load-balancer/server/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/load-balancer/server/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/web-server/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/web-server/tests" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/load_balancer/target" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
       <excludeFolder url="file://$MODULE_DIR$/load-balancer/target" />
+      <excludeFolder url="file://$MODULE_DIR$/web-server/target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

@@ -1,0 +1,17 @@
+name: Security Audit Web Server
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  push:
+    paths:
+      - 'web-server/**/Cargo.toml'
+      - 'web-server/**/Cargo.lock'
+jobs:
+  security_audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: taiki-e/install-action@cargo-deny
+      - name: Scan for vulnerabilities
+        run: cargo deny check advisories
+        working-directory: ./web-server
