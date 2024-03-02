@@ -19,12 +19,7 @@ async fn spawn_app() -> std::io::Result<TestApp> {
         run_server(listener).expect("Unable to start server");
     });
 
-    Ok(
-        TestApp {
-            address,
-            port
-        }
-    )
+    Ok(TestApp { address, port })
 }
 
 #[tokio::test]
@@ -33,10 +28,7 @@ async fn server_should_listen_for_connections() {
     let client = reqwest::Client::new();
 
     let response = client
-        .get(format!(
-            "http://{}:{}/",
-            &app.address, &app.port
-        ))
+        .get(format!("http://{}:{}/", &app.address, &app.port))
         .send()
         .await
         .expect("Failed to execute request");
@@ -50,10 +42,7 @@ async fn server_should_respond_with_path() {
     let client = reqwest::Client::new();
 
     let response = client
-        .get(format!(
-            "http://{}:{}/aloha",
-            &app.address, &app.port
-        ))
+        .get(format!("http://{}:{}/aloha", &app.address, &app.port))
         .send()
         .await
         .expect("Failed to execute request");
@@ -61,7 +50,10 @@ async fn server_should_respond_with_path() {
     let status = response.status().as_u16();
     assert_eq!(status, 200);
 
-    let content = response.text().await.expect("Failed to extract response content.");
+    let content = response
+        .text()
+        .await
+        .expect("Failed to extract response content.");
     assert_eq!("Requested path: /aloha".to_string(), content);
 }
 
@@ -71,10 +63,7 @@ async fn server_should_respond_with_root_path() {
     let client = reqwest::Client::new();
 
     let response = client
-        .get(format!(
-            "http://{}:{}/",
-            &app.address, &app.port
-        ))
+        .get(format!("http://{}:{}/", &app.address, &app.port))
         .send()
         .await
         .expect("Failed to execute request");
@@ -82,6 +71,9 @@ async fn server_should_respond_with_root_path() {
     let status = response.status().as_u16();
     assert_eq!(status, 200);
 
-    let content = response.text().await.expect("Failed to extract response content.");
+    let content = response
+        .text()
+        .await
+        .expect("Failed to extract response content.");
     assert_eq!("Requested path: /".to_string(), content);
 }
