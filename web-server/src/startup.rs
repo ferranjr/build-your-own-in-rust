@@ -1,5 +1,6 @@
 use std::io::{BufRead, BufReader, Write};
 use std::net::{TcpListener, TcpStream};
+use crate::domain::{HttpResponse, StatusCodes};
 
 pub fn run_server(listener: TcpListener) -> std::io::Result<()> {
     let address = listener.local_addr().unwrap();
@@ -27,14 +28,10 @@ fn handle_client(mut stream: TcpStream) -> std::io::Result<()> {
     let path = first_line.split(' ').collect::<Vec<&str>>()[1];
 
     let content = format!("Requested path: {}", path);
-    let content_length_line = format!("Content-Length: {}", content.len());
-    let status_code_line = "HTTP/1.1 200 OK";
+    let http_response = HttpResponse::new(
+        StatusCodes::OK,
+        Some(content)
+    );
 
-    stream.write_all(
-        format!(
-            "{}\r\n{}\r\n\r\n{}\r\n",
-            status_code_line, content_length_line, content
-        )
-        .as_bytes(),
-    )
+    stream.write_all(http_response.response_string().as_bytes())
 }
