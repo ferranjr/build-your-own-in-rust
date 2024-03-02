@@ -3,6 +3,7 @@ use crate::domain::http_response::{HttpResponse, StatusCodes};
 use std::io::{BufRead, BufReader, Write};
 use std::net::{TcpListener, TcpStream};
 use std::path::Path;
+use std::thread;
 
 pub fn run_server(listener: TcpListener) -> std::io::Result<()> {
     let address = listener.local_addr().unwrap();
@@ -12,7 +13,16 @@ pub fn run_server(listener: TcpListener) -> std::io::Result<()> {
         address.port()
     );
     for stream in listener.incoming() {
-        handle_client(stream?).expect("Failed to handle the client request");
+        match stream {
+            Ok(stream) => {
+                thread::spawn(|| {
+                    handle_client(stream).expect("Failed to handle the client request");
+                });
+            }
+            Err(e) => {
+                println!("Something went terribly wrong dealing the incoming stream: {:?}", e)
+            }
+        }
     }
     Ok(())
 }

@@ -10,8 +10,7 @@ Currently, using:
 * [x] Step 0. We are using RUST
 * [x] Step 1. Http Server listening on port `8080` and handle single connection
 * [x] Step 2. Returning HTML
-* [ ] Step 3. Add Concurrency
+* [x] Step 3. Add Concurrency
 * [x] Step 4. Ensure we only server documents within `www` directory
-* [ ] ???
 
 # Running Locally
