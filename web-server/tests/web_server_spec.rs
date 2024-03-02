@@ -78,6 +78,48 @@ async fn server_should_respond_with_index_html_if_not_specified() {
 }
 
 #[tokio::test]
+async fn server_should_respond_with_index_html_if_specified_for_subdirectory() {
+    let app = spawn_app().await.expect("Failed to start the app");
+    let client = reqwest::Client::new();
+
+    let response = client
+        .get(format!("http://{}:{}/foobar/index.html", &app.address, &app.port))
+        .send()
+        .await
+        .expect("Failed to execute request");
+
+    let status = response.status().as_u16();
+    assert_eq!(status, 200);
+
+    let content = response
+        .text()
+        .await
+        .expect("Failed to extract response content.");
+    assert!(content.contains("This is the index file within foobar directory"));
+}
+
+#[tokio::test]
+async fn server_should_respond_with_index_html_if_not_specified_for_subdirectory() {
+    let app = spawn_app().await.expect("Failed to start the app");
+    let client = reqwest::Client::new();
+
+    let response = client
+        .get(format!("http://{}:{}/foobar", &app.address, &app.port))
+        .send()
+        .await
+        .expect("Failed to execute request");
+
+    let status = response.status().as_u16();
+    assert_eq!(status, 200);
+
+    let content = response
+        .text()
+        .await
+        .expect("Failed to extract response content.");
+    assert!(content.contains("This is the index file within foobar directory"));
+}
+
+#[tokio::test]
 async fn server_should_respond_not_found_for_invalid_path() {
     let app = spawn_app().await.expect("Failed to start the app");
     let client = reqwest::Client::new();
