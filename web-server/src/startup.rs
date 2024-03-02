@@ -1,50 +1,37 @@
 use crate::domain::http_request::{HttpRequest, Method};
 use crate::domain::http_response::{HttpResponse, StatusCodes};
-use std::io::{BufRead, BufReader, Write};
-use std::net::{TcpListener, TcpStream};
 use std::path::Path;
-use std::thread;
+use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
+use tokio::net::{TcpListener, TcpStream};
 
-pub fn run_server(listener: TcpListener) -> std::io::Result<()> {
+pub async fn run_server(listener: TcpListener) -> std::io::Result<()> {
     let address = listener.local_addr().unwrap();
     println!(
         "Server started at host {} and port {}",
         address.ip(),
         address.port()
     );
-    for stream in listener.incoming() {
-        match stream {
-            Ok(stream) => {
-                thread::spawn(|| {
-                    handle_client(stream).expect("Failed to handle the client request");
-                });
-            }
-            Err(e) => {
-                println!("Something went terribly wrong dealing the incoming stream: {:?}", e)
-            }
-        }
+    loop {
+        let (stream, _) = listener.accept().await?;
+        handle_client(stream).await?;
     }
-    Ok(())
 }
 
-fn handle_client(mut stream: TcpStream) -> std::io::Result<()> {
+async fn handle_client(stream: TcpStream) -> std::io::Result<()> {
     println!("Server received a connection!");
-    let buf_reader = BufReader::new(&mut stream);
-    let http_request_strings: Vec<_> = buf_reader
-        .lines()
-        .map(|result| result.unwrap())
-        .take_while(|line| !line.is_empty())
-        .collect();
+    let mut stream = BufReader::new(stream);
 
-    let HttpRequest { method, path } = http_request_strings[0].parse::<HttpRequest>()?;
+    let mut first_line = String::new();
+    stream.read_line(&mut first_line).await.unwrap();
 
-    let http_response = handle_request(method, path)?;
-    stream.write_all(http_response.response_string().as_bytes())
+    let HttpRequest { method, path } = first_line.parse::<HttpRequest>()?;
+    let http_response = handle_request(method, path).await?;
+    stream.write_all(http_response.response_string().as_bytes()).await
 }
 
-fn handle_request(method: Method, path: String) -> std::io::Result<HttpResponse> {
+async fn handle_request(method: Method, path: String) -> std::io::Result<HttpResponse> {
     match (method, path) {
-        (Method::GET, path) => match load_file(path) {
+        (Method::GET, path) => match load_file(path).await {
             Ok(content) => Ok(HttpResponse::new(StatusCodes::OK, Some(content))),
             Err(_) => Ok(HttpResponse::new(StatusCodes::NotFound, None)),
         },
@@ -52,11 +39,11 @@ fn handle_request(method: Method, path: String) -> std::io::Result<HttpResponse>
     }
 }
 
-fn load_file(path: String) -> std::io::Result<String> {
+async fn load_file(path: String) -> std::io::Result<String> {
     let final_path = std::env::current_dir()?.join(Path::new(&format!("www{}", path)));
     if final_path.is_file() {
-        std::fs::read_to_string(final_path)
+        tokio::fs::read_to_string(final_path).await
     } else {
-        std::fs::read_to_string(final_path.join("index.html"))
+        tokio::fs::read_to_string(final_path.join("index.html")).await
     }
 }

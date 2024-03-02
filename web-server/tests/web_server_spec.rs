@@ -1,5 +1,4 @@
-use std::net::TcpListener;
-use std::thread;
+use tokio::net::TcpListener;
 use web_server::startup::run_server;
 
 struct TestApp {
@@ -9,14 +8,14 @@ struct TestApp {
 
 async fn spawn_app() -> std::io::Result<TestApp> {
     let address = format!("{}:{}", "127.0.0.1", 0);
-    let listener = TcpListener::bind(address)?;
+    let listener = TcpListener::bind(address).await?;
     let local_address = listener.local_addr().unwrap();
     let address = local_address.ip().to_string();
     let port = local_address.port();
 
-    thread::spawn(move || {
+    tokio::task::spawn(async move {
         println!("Spinning up the test server at port {}", port);
-        run_server(listener).expect("Unable to start server");
+        run_server(listener).await.expect("Unable to start server");
     });
 
     Ok(TestApp { address, port })
