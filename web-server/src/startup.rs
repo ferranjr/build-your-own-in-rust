@@ -1,4 +1,5 @@
-use crate::domain::{HttpResponse, StatusCodes};
+use crate::domain::http_request::{HttpRequest, Method};
+use crate::domain::http_response::{HttpResponse, StatusCodes};
 use std::io::{BufRead, BufReader, Write};
 use std::net::{TcpListener, TcpStream};
 
@@ -18,17 +19,22 @@ pub fn run_server(listener: TcpListener) -> std::io::Result<()> {
 fn handle_client(mut stream: TcpStream) -> std::io::Result<()> {
     println!("Server received a connection!");
     let buf_reader = BufReader::new(&mut stream);
-    let http_request: Vec<_> = buf_reader
+    let http_request_strings: Vec<_> = buf_reader
         .lines()
         .map(|result| result.unwrap())
         .take_while(|line| !line.is_empty())
         .collect();
 
-    let first_line = http_request[0].to_string();
-    let path = first_line.split(' ').collect::<Vec<&str>>()[1];
+    let HttpRequest { method, path } = http_request_strings[0].parse::<HttpRequest>()?;
 
-    let content = format!("Requested path: {}", path);
-    let http_response = HttpResponse::new(StatusCodes::OK, Some(content));
-
+    let http_response = handle_request(method, path)?;
     stream.write_all(http_response.response_string().as_bytes())
+}
+
+fn handle_request(method: Method, path: String) -> std::io::Result<HttpResponse> {
+    let content = format!("Requested path: {}", path);
+    match (method, path) {
+        (Method::GET, _) => Ok(HttpResponse::new(StatusCodes::OK, Some(content))),
+        (_, _) => Ok(HttpResponse::new(StatusCodes::NotFound, None)),
+    }
 }

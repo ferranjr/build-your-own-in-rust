@@ -77,3 +77,21 @@ async fn server_should_respond_with_root_path() {
         .expect("Failed to extract response content.");
     assert_eq!("Requested path: /".to_string(), content);
 }
+
+#[tokio::test]
+async fn server_should_respond_not_found_for_invalid_path() {
+    let app = spawn_app().await.expect("Failed to start the app");
+    let client = reqwest::Client::new();
+
+    let response = client
+        .get(format!(
+            "http://{}:{}/invalid_path",
+            &app.address, &app.port
+        ))
+        .send()
+        .await
+        .expect("Failed to execute request");
+
+    let status = response.status().as_u16();
+    assert_eq!(status, 404);
+}

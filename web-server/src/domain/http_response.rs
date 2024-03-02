@@ -49,7 +49,7 @@ impl Display for StatusCodes {
 
 #[cfg(test)]
 mod tests {
-    use crate::domain::{HttpResponse, StatusCodes};
+    use super::{HttpResponse, StatusCodes};
 
     #[test]
     fn http_response_builds_ok_string() {
