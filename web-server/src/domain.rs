@@ -1,5 +1,6 @@
 use std::fmt::Display;
 
+#[derive(Debug)]
 pub struct HttpResponse {
     status_code: StatusCodes,
     content: String,
@@ -22,6 +23,7 @@ impl HttpResponse {
     }
 }
 
+#[derive(Debug)]
 pub enum StatusCodes {
     OK,
     Created,
@@ -56,6 +58,59 @@ mod tests {
         assert_eq!(
             str,
             "HTTP/1.1 200 OK\r\nContent-Length: 23\r\n\r\nRequested path: /foobar\r\n"
+        )
+    }
+
+    #[test]
+    fn http_response_builds_created_string() {
+        let str = HttpResponse::new(
+            StatusCodes::Created,
+            Some("Requested path: /foobar".to_string()),
+        )
+        .response_string();
+        assert_eq!(
+            str,
+            "HTTP/1.1 201 Created\r\nContent-Length: 23\r\n\r\nRequested path: /foobar\r\n"
+        )
+    }
+
+    #[test]
+    fn http_response_builds_accepted_string() {
+        let str = HttpResponse::new(
+            StatusCodes::Accepted,
+            Some("Requested path: /foobar".to_string()),
+        )
+        .response_string();
+        assert_eq!(
+            str,
+            "HTTP/1.1 202 Accepted\r\nContent-Length: 23\r\n\r\nRequested path: /foobar\r\n"
+        )
+    }
+
+    #[test]
+    fn http_response_builds_no_content_string() {
+        let str = HttpResponse::new(StatusCodes::NoContent, None).response_string();
+        assert_eq!(
+            str,
+            "HTTP/1.1 204 No Content\r\nContent-Length: 0\r\n\r\n\r\n"
+        )
+    }
+
+    #[test]
+    fn http_response_builds_not_found_string() {
+        let str = HttpResponse::new(StatusCodes::NotFound, None).response_string();
+        assert_eq!(
+            str,
+            "HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\n\r\n\r\n"
+        )
+    }
+
+    #[test]
+    fn http_response_builds_internal_server_error_string() {
+        let str = HttpResponse::new(StatusCodes::InternalServerError, None).response_string();
+        assert_eq!(
+            str,
+            "HTTP/1.1 500 Internal Server Error\r\nContent-Length: 0\r\n\r\n\r\n"
         )
     }
 }
