@@ -83,7 +83,10 @@ async fn server_should_respond_with_index_html_if_specified_for_subdirectory() {
     let client = reqwest::Client::new();
 
     let response = client
-        .get(format!("http://{}:{}/foobar/index.html", &app.address, &app.port))
+        .get(format!(
+            "http://{}:{}/foobar/index.html",
+            &app.address, &app.port
+        ))
         .send()
         .await
         .expect("Failed to execute request");
