@@ -12,5 +12,4 @@ Currently, using:
 * [x] Step 2. Returning HTML
 * [x] Step 3. Add Concurrency
 * [x] Step 4. Ensure we only server documents within `www` directory
-
-# Running Locally
+* [ ] Extra. Using [nom](https://docs.rs/nom/latest/nom/) crate for stream parsing.
