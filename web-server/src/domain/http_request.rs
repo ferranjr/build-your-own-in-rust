@@ -1,3 +1,8 @@
+use nom::bytes::complete::{take_until};
+use nom::character::complete::{alphanumeric1, space0};
+use nom::error::{context, VerboseError};
+use nom::sequence::tuple;
+use nom::IResult;
 use std::str::FromStr;
 
 /// On this implementation we only care about this two
@@ -12,17 +17,13 @@ impl FromStr for HttpRequest {
     type Err = std::io::Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let bits = s.split(' ').collect::<Vec<&str>>();
-        let method = bits[0].parse::<Method>()?;
-        let path = bits[1];
-        Ok(HttpRequest {
-            method,
-            path: path.to_string(),
-        })
+        parse_http_request(s)
+            .map(|(_, http_request)| http_request)
+            .map_err(|_| std::io::Error::from(std::io::ErrorKind::InvalidData))
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum Method {
     CONNECT,
     GET,
@@ -39,7 +40,7 @@ impl FromStr for Method {
     type Err = std::io::Error;
 
     fn from_str(s: &str) -> std::io::Result<Self> {
-        match s {
+        match s.to_uppercase().as_str() {
             "CONNECT" => Ok(Method::CONNECT),
             "GET" => Ok(Method::GET),
             "HEAD" => Ok(Method::HEAD),
@@ -54,9 +55,81 @@ impl FromStr for Method {
     }
 }
 
+type Res<T, U> = IResult<T, U, VerboseError<T>>;
+
+fn parse_method(input: &str) -> Res<&str, Method> {
+    nom::combinator::map_res(alphanumeric1, FromStr::from_str)(input)
+}
+
+fn parse_path(input: &str) -> Res<&str, String> {
+    context("path", take_until(" "))(input).map(|(next, res)| (next, res.to_string()))
+}
+
+fn parse_http_request(input: &str) -> Res<&str, HttpRequest> {
+    context("http_request", tuple((parse_method, space0, parse_path)))(input).map(
+        |(next, (method, _, path))| {
+            (
+                next,
+                HttpRequest {
+                    method,
+                    path: path.to_string(),
+                },
+            )
+        },
+    )
+}
+
 #[cfg(test)]
 mod test {
-    use crate::domain::http_request::{HttpRequest, Method};
+    use super::*;
+    use nom::error::{ErrorKind, VerboseErrorKind};
+
+    #[test]
+    fn parser_method_works_when_valid_method_input() {
+        assert_eq!(parse_method("CONNECT"), Ok(("", Method::CONNECT)));
+        assert_eq!(parse_method("GET"), Ok(("", Method::GET)));
+        assert_eq!(parse_method("HEAD"), Ok(("", Method::HEAD)));
+        assert_eq!(parse_method("DELETE"), Ok(("", Method::DELETE)));
+        assert_eq!(parse_method("OPTIONS"), Ok(("", Method::OPTIONS)));
+        assert_eq!(parse_method("PATCH"), Ok(("", Method::PATCH)));
+        assert_eq!(parse_method("POST"), Ok(("", Method::POST)));
+        assert_eq!(parse_method("PUT"), Ok(("", Method::PUT)));
+        assert_eq!(parse_method("TRACE"), Ok(("", Method::TRACE)));
+        assert_eq!(parse_method("connect"), Ok(("", Method::CONNECT)));
+        assert_eq!(parse_method("get"), Ok(("", Method::GET)));
+        assert_eq!(parse_method("head"), Ok(("", Method::HEAD)));
+        assert_eq!(parse_method("delete"), Ok(("", Method::DELETE)));
+        assert_eq!(parse_method("options"), Ok(("", Method::OPTIONS)));
+        assert_eq!(parse_method("patch"), Ok(("", Method::PATCH)));
+        assert_eq!(parse_method("post"), Ok(("", Method::POST)));
+        assert_eq!(parse_method("put"), Ok(("", Method::PUT)));
+        assert_eq!(parse_method("trace"), Ok(("", Method::TRACE)));
+    }
+
+    #[test]
+    fn parser_method_fails_for_invalid_input() {
+        assert_eq!(
+            parse_method("banana"),
+            Err(nom::Err::Error(VerboseError {
+                errors: vec![("banana", VerboseErrorKind::Nom(ErrorKind::MapRes))]
+            }))
+        );
+    }
+
+    #[test]
+    fn parser_http_requests_works_for_valid_inputs() {
+        let input = "GET /aloha HTTP/1.1";
+        assert_eq!(
+            parse_http_request(input),
+            Ok((
+                " HTTP/1.1",
+                HttpRequest {
+                    method: Method::GET,
+                    path: "/aloha".to_string(),
+                }
+            ))
+        )
+    }
 
     #[test]
     fn method_creation_succeeds_from_valid_string() {
