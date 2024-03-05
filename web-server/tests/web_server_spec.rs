@@ -9,7 +9,7 @@ struct TestApp {
 async fn spawn_app() -> std::io::Result<TestApp> {
     let address = format!("{}:{}", "127.0.0.1", 0);
     let listener = TcpListener::bind(address).await?;
-    let local_address = listener.local_addr().unwrap();
+    let local_address = listener.local_addr()?;
     let address = local_address.ip().to_string();
     let port = local_address.port();
 

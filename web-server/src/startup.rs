@@ -5,7 +5,7 @@ use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 use tokio::net::{TcpListener, TcpStream};
 
 pub async fn run_server(listener: TcpListener) -> std::io::Result<()> {
-    let address = listener.local_addr().unwrap();
+    let address = listener.local_addr()?;
     println!(
         "Server started at host {} and port {}",
         address.ip(),
@@ -22,7 +22,7 @@ async fn handle_client(stream: TcpStream) -> std::io::Result<()> {
     let mut stream = BufReader::new(stream);
 
     let mut first_line = String::new();
-    stream.read_line(&mut first_line).await.unwrap();
+    stream.read_line(&mut first_line).await?;
 
     let HttpRequest { method, path } = first_line.parse::<HttpRequest>()?;
     let http_response = handle_request(method, path).await?;
