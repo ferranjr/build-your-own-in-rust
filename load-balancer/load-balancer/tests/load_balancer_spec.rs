@@ -77,14 +77,14 @@ async fn spawn_app(test_servers: Vec<SocketAddr>) -> Result<TestApp, Box<dyn std
     HealthChecker::init(Arc::clone(&targets)).await;
 
     // Start the lb
-    tokio::task::spawn(async move {
+    tokio::task::spawn(async {
         startup::run(listener, targets)
             .await
             .expect("Failed to start server");
     });
 
     // Sleep first to ensure healthcheck initialises al servers
-    time::sleep(Duration::from_secs(1)).await;
+    time::sleep(Duration::from_millis(300)).await;
 
     Ok(TestApp { address, port })
 }
@@ -126,7 +126,10 @@ async fn server_root_path_through_load_balancer() {
 
     let content = &response.text().await.expect("Failed to read text");
 
-    assert_eq!(*content, format!("Hello from server {}", test_server.name));
+    assert_eq!(
+        *content,
+        format!("Hello from server {}\n", test_server.name)
+    );
 }
 
 #[tokio::test]
@@ -175,7 +178,7 @@ async fn round_robin_works_when_all_servers_healthy() {
 
     assert_eq!(
         content_1,
-        format!("Hello from server {}", test_server_a.name)
+        format!("Hello from server {}\n", test_server_a.name)
     );
 
     let content_2 = app
@@ -187,7 +190,7 @@ async fn round_robin_works_when_all_servers_healthy() {
 
     assert_eq!(
         content_2,
-        format!("Hello from server {}", test_server_b.name)
+        format!("Hello from server {}\n", test_server_b.name)
     );
 
     let content_3 = app
@@ -199,7 +202,7 @@ async fn round_robin_works_when_all_servers_healthy() {
 
     assert_eq!(
         content_3,
-        format!("Hello from server {}", test_server_a.name)
+        format!("Hello from server {}\n", test_server_a.name)
     );
 }
 
@@ -232,7 +235,7 @@ async fn round_robin_skips_unhealthy_server() {
 
     assert_eq!(
         content_1,
-        format!("Hello from server {}", test_server_a.name)
+        format!("Hello from server {}\n", test_server_a.name)
     );
 
     let content_2 = app
@@ -244,7 +247,7 @@ async fn round_robin_skips_unhealthy_server() {
 
     assert_eq!(
         content_2,
-        format!("Hello from server {}", test_server_a.name)
+        format!("Hello from server {}\n", test_server_a.name)
     );
 
     let content_3 = app
@@ -256,6 +259,6 @@ async fn round_robin_skips_unhealthy_server() {
 
     assert_eq!(
         content_3,
-        format!("Hello from server {}", test_server_a.name)
+        format!("Hello from server {}\n", test_server_a.name)
     );
 }

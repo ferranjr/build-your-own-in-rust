@@ -77,5 +77,5 @@ async fn server_root_path_should_show_the_server_name() {
 
     let content = response.text().await.expect("Failed to extract content.");
 
-    assert_eq!(format!("Hello from server {}", &app.name), content)
+    assert_eq!(format!("Hello from server {}\n", &app.name), content)
 }

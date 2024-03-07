@@ -11,7 +11,7 @@ impl HealthChecker {
         let servers = &targets.lock().await.servers;
         for server in servers.iter() {
             let server = Arc::clone(server);
-            tokio::spawn(HealthChecker::healthcheck(server));
+            tokio::spawn(async { HealthChecker::healthcheck(server).await });
         }
     }
 
