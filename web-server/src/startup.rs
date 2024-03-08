@@ -13,7 +13,7 @@ pub async fn run_server(listener: TcpListener) -> std::io::Result<()> {
     );
     loop {
         let (stream, _) = listener.accept().await?;
-        handle_client(stream).await?;
+        tokio::spawn(async move { handle_client(stream).await });
     }
 }
 

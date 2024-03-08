@@ -56,7 +56,7 @@ impl FromStr for Method {
 
 #[cfg(test)]
 mod test {
-    use crate::domain::http_request::{HttpRequest, Method};
+    use super::*;
 
     #[test]
     fn method_creation_succeeds_from_valid_string() {
