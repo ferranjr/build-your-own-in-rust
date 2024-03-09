@@ -12,6 +12,9 @@
       <sourceFolder url="file://$MODULE_DIR$/load-balancer/server/tests" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/web-server/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/web-server/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/error-handling/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/error-handling/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/url-shortener/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/load_balancer/target" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
       <excludeFolder url="file://$MODULE_DIR$/load-balancer/target" />
