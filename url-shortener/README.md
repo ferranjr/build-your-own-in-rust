@@ -6,6 +6,8 @@ Inspired by https://codingchallenges.fyi/challenges/challenge-url-shortener my o
 Currently, using:
 * Backend:
   * https://tokio.rs/ as async runtime
+  * https://actix.rs/ as web framework
+  * https://surrealdb.com/ as database
 * Frontend:
   * https://sycamore-rs.netlify.app/ 
 
