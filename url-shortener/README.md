@@ -7,14 +7,14 @@ Currently, using:
 * Backend:
   * https://tokio.rs/ as async runtime
   * https://actix.rs/ as web framework
-  * https://surrealdb.com/ as database
+  * https://www.mongodb.com/ as persistence layer
 * Frontend:
   * https://sycamore-rs.netlify.app/ 
 
 # Current State
 * [ ] Step 0. Using Full Stack RUST
-* [ ] Step 1. 
-* [ ] Step 2. 
+* [ ] Step 1. Setting creation of short url endpoint
+* [ ] Step 2. Redirection endpoint
 * [ ] Step 3. 
 * [ ] Step 4. 
 
