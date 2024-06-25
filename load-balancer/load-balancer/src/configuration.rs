@@ -1,6 +1,6 @@
-use std::env;
 use serde;
 use serde_aux::prelude::deserialize_number_from_string;
+use std::env;
 use std::net::SocketAddr;
 
 #[derive(serde::Deserialize, Clone)]
@@ -39,7 +39,7 @@ pub fn get_configuration() -> Result<Settings, config::ConfigError> {
 
     let settings = config::Config::builder()
         .add_source(config::File::from(
-            configuration_directory.join(&config_file),
+            configuration_directory.join(config_file),
         ))
         .build()?;
 

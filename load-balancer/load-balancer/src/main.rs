@@ -12,8 +12,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let address = format!("{}:{}", "0.0.0.0", settings.application.port);
     let listener = TcpListener::bind(address).await?;
     let targets = settings.application.targets().await;
-    let targets: Arc<Mutex<Targets>> =
-        Arc::new(Mutex::new(Targets::new(targets)));
+    let targets: Arc<Mutex<Targets>> = Arc::new(Mutex::new(Targets::new(targets)));
 
     // Initialises the monitoring of targets
     HealthChecker::init(Arc::clone(&targets)).await;
