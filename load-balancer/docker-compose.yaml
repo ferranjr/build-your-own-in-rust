@@ -1,6 +1,4 @@
-version: '3.9'
 name: "load-balancer"
-
 services:
 
   server_a:
@@ -27,9 +25,14 @@ services:
     environment:
       - SERVER_NAME=C3P0
 
-# TODO: Loading config specific for docker-compose, so I can run all here
-#  load-balancer:
-#    build: load-balancer/.
-#    image: localhost/load-balancer:latest
-#    ports:
-#      - "8080:8080"
+  load-balancer:
+    build: load-balancer/.
+    image: localhost/load-balancer:latest
+    environment:
+      - CONFIG_FILE=/load-balancer/configuration/docker.yaml
+    ports:
+      - "8080:8080"
+    links:
+      - server_a
+      - server_b
+      - server_c

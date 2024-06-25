@@ -13,14 +13,14 @@ Currently, using:
  - [x] Load Balancer running on port 8080
  - [x] Load Balancer using Round robin to redirect calls
  - [x] Load Balancer to keep track of servers health
- - [ ] Improve set up to start servers using CLI or docker so makes manual testing more flexible
- - [ ] Pack LB and add docker-compose
+ - [x] Improve set up to start servers using CLI or docker so makes manual testing more flexible
+ - [x] Pack LB and add docker-compose
  - [ ] Improve error handling
  - [ ] Use tracing/logging
 
 # Running Locally
 
-Start docker compose which starts 3 servers running in ports 8081, 8082 and 8083
+Start docker compose which starts the 3 servers running in ports 8081, 8082 and 8083, and the load balancer running in port 8080.
 ```shell
 docker-compose up --build --remove-orphans
 ```
@@ -29,10 +29,6 @@ You can curl the servers to see the different messages on root path
 curl http://127.0.0.1:8081/
 curl http://127.0.0.1:8082/
 curl http://127.0.0.1:8083/
-```
-Running the load_balancer/main.rs will set the LB pointing to those 2 servers.
-```shell
-cargo run --bin load-balancer
 ```
 After that, curl to the load balancer will alternate between the two servers following Round Robin algorithm.
 ```shell

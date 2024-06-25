@@ -11,8 +11,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let settings = get_configuration().expect("Unable to load configuration");
     let address = format!("{}:{}", "0.0.0.0", settings.application.port);
     let listener = TcpListener::bind(address).await?;
+    let targets = settings.application.targets().await;
     let targets: Arc<Mutex<Targets>> =
-        Arc::new(Mutex::new(Targets::new(settings.application.targets)));
+        Arc::new(Mutex::new(Targets::new(targets)));
 
     // Initialises the monitoring of targets
     HealthChecker::init(Arc::clone(&targets)).await;

@@ -1,4 +1,4 @@
-FROM rust:1.76.0-buster as builder
+FROM rust:1.77.2-buster as builder
 WORKDIR /app
 COPY .. .
 RUN cargo install --path .

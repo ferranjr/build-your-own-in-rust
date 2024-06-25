@@ -1,0 +1,6 @@
+application:
+  port: 8080
+  targets_dns:
+    - "server_a:8081"
+    - "server_b:8081"
+    - "server_c:8081"
