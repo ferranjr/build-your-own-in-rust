@@ -1,0 +1,30 @@
+name: "url-shortener"
+
+services:
+
+#  url-shortener:
+#    build: .
+#    image: localhost/url-shortener:latest
+#    ports:
+#      - "8080:8080"
+#    links:
+#      - mongodb
+#    environment:
+#      - MONGO_URI=mongodb://db_user:db_user_password@mongodb:27017/short_urls_db
+
+  mongodb:
+    image: arm64v8/mongo:8.0.0
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=user
+      - MONGO_INITDB_ROOT_PASSWORD=pass
+      - MONGO_SHORT_URLS_DB=short_urls_db
+      - MONGO_SHORT_URLS_DB_USERNAME=db_user
+      - MONGO_SHORT_URLS_DB_PASSWORD=db_user_password
+    volumes:
+      - ./mongo/scripts/init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh:ro
+      - type: bind
+        source: ./mongo/data
+        target: /data/db
