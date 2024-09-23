@@ -6,13 +6,13 @@ use serde_json::json;
 use std::net::TcpListener;
 use testcontainers::core::IntoContainerPort;
 use testcontainers::runners::AsyncRunner;
-use testcontainers::ImageExt;
-use testcontainers_modules::mongo;
+use testcontainers::{ContainerRequest, ImageExt};
+use testcontainers_modules::mongo::Mongo;
 use url_shortener::domain::urls::models::short_url::ShortUrl;
 use url_shortener::domain::urls::service::ServiceConfig;
+use url_shortener::inbound::http::handlers::short_urls::CreateShortUrlResponse;
 use url_shortener::inbound::http::HttpServer;
 use url_shortener::outbound::mongo::{MongoClient, MongoDatabase};
-use url_shortener::inbound::http::handlers::short_urls::CreateShortUrlResponse;
 
 #[derive(Debug)]
 struct TestApp {
@@ -47,10 +47,10 @@ async fn set_up_database(mongo_uri: &str) -> Result<TestMongo, Box<dyn std::erro
         .create_indexes(vec![index_long_url, index_key])
         .await
         .unwrap();
-    
+
     Ok(TestMongo {
         mongo_uri: mongo_uri.to_string(),
-        mongo_db_name
+        mongo_db_name,
     })
 }
 
@@ -82,23 +82,19 @@ async fn spawn_app(test_mongo: TestMongo) -> Result<TestApp, Box<dyn std::error:
     Ok(TestApp { base_url })
 }
 
+fn container_request() -> ContainerRequest<Mongo> {
+    Mongo::default().with_name("mongo").with_tag("8.0.0")
+}
+
 #[tokio::test]
 async fn healthcheck_should_be_ok() {
-    let mongodb = mongo::Mongo::default()
-        .with_name("arm64v8/mongo")
-        .with_tag("8.0.0")
-        .start()
-        .await
-        .unwrap();
-
+    let mongodb = container_request().start().await.unwrap();
     let host_ip = mongodb.get_host().await.unwrap();
     let host_port = mongodb.get_host_port_ipv4(27017.tcp()).await.unwrap();
     let mongo_uri = format!("mongodb://{host_ip}:{host_port}");
 
     // Set up indices and DB
-    let test_mongo = set_up_database(mongo_uri.as_str())
-        .await
-        .unwrap();
+    let test_mongo = set_up_database(mongo_uri.as_str()).await.unwrap();
 
     let test_app = spawn_app(test_mongo).await.unwrap();
     let client = reqwest::Client::new();
@@ -117,13 +113,7 @@ async fn healthcheck_should_be_ok() {
 
 #[tokio::test]
 async fn fail_with_400_for_non_valid_urls() {
-    let mongodb = mongo::Mongo::default()
-        .with_name("arm64v8/mongo")
-        .with_tag("8.0.0")
-        .start()
-        .await
-        .unwrap();
-
+    let mongodb = container_request().start().await.unwrap();
     let host_ip = mongodb.get_host().await.unwrap();
     let host_port = mongodb.get_host_port_ipv4(27017.tcp()).await.unwrap();
     let mongo_uri = format!("mongodb://{host_ip}:{host_port}");
@@ -155,13 +145,7 @@ async fn fail_with_400_for_non_valid_urls() {
 
 #[tokio::test]
 async fn success_for_a_valid_url() {
-    let mongodb = mongo::Mongo::default()
-        .with_name("arm64v8/mongo")
-        .with_tag("8.0.0")
-        .start()
-        .await
-        .unwrap();
-
+    let mongodb = container_request().start().await.unwrap();
     let host_ip = mongodb.get_host().await.unwrap();
     let host_port = mongodb.get_host_port_ipv4(27017.tcp()).await.unwrap();
     let mongo_uri = format!("mongodb://{host_ip}:{host_port}");
@@ -188,13 +172,7 @@ async fn success_for_a_valid_url() {
 
 #[tokio::test]
 async fn idempotency() {
-    let mongodb = mongo::Mongo::default()
-        .with_name("arm64v8/mongo")
-        .with_tag("8.0.0")
-        .start()
-        .await
-        .unwrap();
-
+    let mongodb = container_request().start().await.unwrap();
     let host_ip = mongodb.get_host().await.unwrap();
     let host_port = mongodb.get_host_port_ipv4(27017.tcp()).await.unwrap();
     let mongo_uri = format!("mongodb://{host_ip}:{host_port}");
@@ -233,16 +211,9 @@ async fn idempotency() {
     assert_eq!(create_response_one, create_response_two);
 }
 
-
 #[tokio::test]
 async fn success_for_redirection_to_long_url_that_exists() {
-    let mongodb = mongo::Mongo::default()
-        .with_name("arm64v8/mongo")
-        .with_tag("8.0.0")
-        .start()
-        .await
-        .unwrap();
-
+    let mongodb = container_request().start().await.unwrap();
     let host_ip = mongodb.get_host().await.unwrap();
     let host_port = mongodb.get_host_port_ipv4(27017.tcp()).await.unwrap();
     let mongo_uri = format!("mongodb://{host_ip}:{host_port}");
@@ -265,7 +236,7 @@ async fn success_for_redirection_to_long_url_that_exists() {
         .send()
         .await
         .expect("Failed to execute request");
-    
+
     // Assert
     assert_eq!(response_one.status().as_u16(), 201);
     let create_response_one: CreateShortUrlResponse = response_one.json().await.unwrap();
@@ -275,7 +246,7 @@ async fn success_for_redirection_to_long_url_that_exists() {
         .send()
         .await
         .expect("Failed to execute request");
-    
+
     // Assert
     assert_eq!(response_two.status().as_u16(), 303);
     assert_eq!(
@@ -286,13 +257,7 @@ async fn success_for_redirection_to_long_url_that_exists() {
 
 #[tokio::test]
 async fn fail_404_for_redirection_to_long_url_that_doesnt_exists() {
-    let mongodb = mongo::Mongo::default()
-        .with_name("arm64v8/mongo")
-        .with_tag("8.0.0")
-        .start()
-        .await
-        .unwrap();
-
+    let mongodb = container_request().start().await.unwrap();
     let host_ip = mongodb.get_host().await.unwrap();
     let host_port = mongodb.get_host_port_ipv4(27017.tcp()).await.unwrap();
     let mongo_uri = format!("mongodb://{host_ip}:{host_port}");

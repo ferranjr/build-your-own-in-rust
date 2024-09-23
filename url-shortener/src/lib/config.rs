@@ -31,11 +31,7 @@ impl Config {
         let mongo_port = load_env(MONGO_PORT)?.parse::<u16>()?;
         let mongo_uri = format!(
             "mongodb://{}:{}@{}:{}/{}",
-            mongo_username,
-            mongo_password,
-            mongo_base_url,
-            mongo_port,
-            mongo_database
+            mongo_username, mongo_password, mongo_base_url, mongo_port, mongo_database
         );
 
         Ok(Config {
