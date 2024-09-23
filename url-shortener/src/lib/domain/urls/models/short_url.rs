@@ -1,8 +1,8 @@
-use std::fmt::{Display, Formatter};
 use derive_more::From;
 use mongodb::error::Error;
 use nanoid::nanoid;
 use serde::{Deserialize, Serialize};
+use std::fmt::{Display, Formatter};
 use thiserror::Error;
 use url::{ParseError, Url};
 
@@ -17,23 +17,18 @@ impl ShortUrl {
         let short_url_id = ShortUrlId::new();
         Self::new(short_url_id, long_url.to_owned())
     }
-    
+
     pub fn new(key: ShortUrlId, long_url: Url) -> Result<Self, ParseError> {
-        Ok(
-            Self {
-                key,
-                long_url,
-            }
-        )
+        Ok(Self { key, long_url })
     }
-    
+
     pub fn key(&self) -> &ShortUrlId {
         &self.key
-    } 
-    
+    }
+
     pub fn long_url(&self) -> &Url {
         &self.long_url
-    } 
+    }
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -93,29 +88,25 @@ impl ShortUrlResponse {
             short_url,
         }
     }
-    
+
     pub fn from(short_url: ShortUrl, base_url: String) -> Result<ShortUrlResponse, ParseError> {
-        let shortened_url = Url::parse(
-           format!("{base_url}{}", short_url.key.0).as_str() 
-        )?;
-        Ok(
-            Self {
-                key: short_url.key,
-                long_url: short_url.long_url,
-                short_url: shortened_url,
-            }
-        )
+        let shortened_url = Url::parse(format!("{base_url}{}", short_url.key.0).as_str())?;
+        Ok(Self {
+            key: short_url.key,
+            long_url: short_url.long_url,
+            short_url: shortened_url,
+        })
     }
 
     pub fn key(&self) -> &ShortUrlId {
         &self.key
     }
-    
+
     pub fn long_url(&self) -> &Url {
         &self.long_url
     }
-    
-    pub fn short_url(&self) ->  &Url {
+
+    pub fn short_url(&self) -> &Url {
         &self.short_url
     }
 }
@@ -169,10 +160,11 @@ mod tests {
         let url = ShortUrlId::new();
         assert_eq!(url.0.len(), 6);
     }
-    
+
     #[test]
     fn create_short_url_entity_from_just_url() {
-        let long_url = Url::parse("https://codingchallenges.fyi/challenges/challenge-url-shortener/").unwrap();
+        let long_url =
+            Url::parse("https://codingchallenges.fyi/challenges/challenge-url-shortener/").unwrap();
         let short_url = ShortUrl::from_long_url(&long_url).unwrap();
 
         assert_eq!(short_url.long_url().as_str(), long_url.as_str())

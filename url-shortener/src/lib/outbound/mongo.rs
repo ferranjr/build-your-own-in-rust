@@ -27,11 +27,14 @@ impl MongoDatabase {
             database: mongo_client.client.database(database_name),
         }
     }
-    
-    fn collection<T>(&self, name: &str) -> Collection<T> where T: Send + Sync {
+
+    fn collection<T>(&self, name: &str) -> Collection<T>
+    where
+        T: Send + Sync,
+    {
         self.database.collection::<T>(name)
     }
-    
+
     fn short_urls_collection(&self) -> Collection<ShortUrl> {
         self.collection::<ShortUrl>("short_urls")
     }
@@ -59,7 +62,8 @@ impl UrlsRepository for MongoDatabase {
         &self,
         long_url: Url,
     ) -> Result<Option<ShortUrl>, RepositoryShortUrlError> {
-        let result = self.short_urls_collection()
+        let result = self
+            .short_urls_collection()
             .find_one(doc! { "long_url": long_url.as_str() })
             .await?;
 
@@ -70,10 +74,11 @@ impl UrlsRepository for MongoDatabase {
         &self,
         short_url: Url,
     ) -> Result<Option<ShortUrl>, RepositoryShortUrlError> {
-        let result = self.short_urls_collection()
+        let result = self
+            .short_urls_collection()
             .find_one(doc! { "short_url": short_url.as_str() })
             .await?;
-        
+
         Ok(result)
     }
 
@@ -81,7 +86,8 @@ impl UrlsRepository for MongoDatabase {
         &self,
         key: ShortUrlId,
     ) -> Result<Option<ShortUrl>, RepositoryShortUrlError> {
-        let result = self.short_urls_collection()
+        let result = self
+            .short_urls_collection()
             .find_one(doc! { "key": key.as_ref() })
             .await?;
 

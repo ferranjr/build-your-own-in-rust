@@ -9,11 +9,9 @@ services:
 #      - "8080:8080"
 #    links:
 #      - mongodb
-#    environment:
-#      - MONGO_URI=mongodb://db_user:db_user_password@mongodb:27017/short_urls_db
 
   mongodb:
-    image: arm64v8/mongo:8.0.0
+    image: mongo:8.0.0
     restart: always
     ports:
       - "27017:27017"
