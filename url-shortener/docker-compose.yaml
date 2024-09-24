@@ -2,13 +2,22 @@ name: "url-shortener"
 
 services:
 
-#  url-shortener:
-#    build: .
-#    image: localhost/url-shortener:latest
-#    ports:
-#      - "8080:8080"
-#    links:
-#      - mongodb
+  url-shortener:
+    build: .
+    image: url-shortener:latest
+    ports:
+      - "8080:8080"
+    links:
+      - mongodb
+    environment:
+      - MONGO_SHORT_URLS_DB=short_urls_db
+      - MONGO_SHORT_URLS_DB_USERNAME=db_user
+      - MONGO_SHORT_URLS_DB_PASSWORD=db_user_password
+      - MONGO_BASE_URL=mongodb
+      - MONGO_PORT=27017
+      - SERVER_PORT=8080
+      - SERVER_BASE_URL=http://localhost:8080/
+      - SERVER_PROTOCOL=http
 
   mongodb:
     image: mongo:8.0.0
@@ -23,6 +32,3 @@ services:
       - MONGO_SHORT_URLS_DB_PASSWORD=db_user_password
     volumes:
       - ./mongo/scripts/init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh:ro
-      - type: bind
-        source: ./mongo/data
-        target: /data/db

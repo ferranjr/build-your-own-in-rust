@@ -8,7 +8,7 @@ name = "url_shortener"
 path = "src/lib/lib.rs"
 
 [[bin]]
-name = "url_shortener_server"
+name = "url-shortener-server"
 path = "src/bin/server/main.rs"
 
 [dependencies]

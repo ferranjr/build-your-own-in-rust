@@ -15,9 +15,19 @@ Currently, using:
  - [x] Unit Tests run locally and in CI env
  - [X] Integration Tests run locally
  - [X] Running Integration Tests in CI
- - [ ] Pack Service using docker and add to docker-compose
- - [ ] Improve startup/running locally
+ - [X] Pack Service using docker and add to docker-compose
+ - [X] Improve startup/running locally
  - [ ] Use tracing/logging
 
-# Running Locally
+# Testing
+Using `cargo test` or, if installed, using `cargo nextest run` will run unit and integration tests. Since we use testcontainers.
 
+# Running Locally
+Using docker-compose we can easily start the application locally:
+```
+docker-compose up
+```
+After that you can run curl commands agains the service:
+```shell
+curl -XPOST "http://127.0.0.1:8080/" --header 'content-type: application/json'  -d'{ "long_url": "https://github.com/ferranjr/build-your-own-in-rust" }'
+```
