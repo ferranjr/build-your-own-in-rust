@@ -12,6 +12,9 @@ Currently, using:
 
 # Current State
  - [x] Set up
+ - [X] Create Short Url, idempotency
+ - [X] Redirect to original url
+ - [X] Delete Short Url
  - [x] Unit Tests run locally and in CI env
  - [X] Integration Tests run locally
  - [X] Running Integration Tests in CI
@@ -20,14 +23,15 @@ Currently, using:
  - [ ] Use tracing/logging
 
 # Testing
-Using `cargo test` or, if installed, using `cargo nextest run` will run unit and integration tests. Since we use testcontainers.
+Using `cargo test` or, if installed, using `cargo nextest run` will run unit and integration tests.
+Since we use test-containers, no need for setting up the DB, in integration tests we are creating the required indexes.
 
 # Running Locally
 Using docker-compose we can easily start the application locally:
 ```
 docker-compose up
 ```
-After that you can run curl commands agains the service:
+After that you can run curl commands against the service:
 ```shell
 curl -XPOST "http://127.0.0.1:8080/" --header 'content-type: application/json'  -d'{ "long_url": "https://github.com/ferranjr/build-your-own-in-rust" }'
 ```

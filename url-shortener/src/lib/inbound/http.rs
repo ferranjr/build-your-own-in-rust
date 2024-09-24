@@ -48,6 +48,10 @@ where
                 "/{key}",
                 web::get().to(handlers::short_urls::get_short_url::<R>),
             )
+            .route(
+                "/{key}",
+                web::delete().to(handlers::short_urls::delete_short_url::<R>),
+            )
     })
     .listen(tcp_listener)?
     .run();

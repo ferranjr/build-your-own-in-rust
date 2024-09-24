@@ -14,6 +14,11 @@ pub trait UrlsService: Clone + Send + Sync + 'static {
         &self,
         key: ShortUrlId,
     ) -> impl Future<Output = Result<Option<ShortUrlResponse>, RepositoryShortUrlError>> + Send;
+
+    fn delete_short_url(
+        &self,
+        key: ShortUrlId,
+    ) -> impl Future<Output = Result<(), RepositoryShortUrlError>> + Send;
 }
 
 pub trait UrlsRepository: Clone + Send + Sync + 'static {
@@ -36,4 +41,9 @@ pub trait UrlsRepository: Clone + Send + Sync + 'static {
         &self,
         key: ShortUrlId,
     ) -> impl Future<Output = Result<Option<ShortUrl>, RepositoryShortUrlError>> + Send;
+
+    fn delete_short_url_by_key(
+        &self,
+        key: ShortUrlId,
+    ) -> impl Future<Output = Result<(), RepositoryShortUrlError>> + Send;
 }

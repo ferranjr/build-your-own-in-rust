@@ -273,11 +273,87 @@ async fn fail_404_for_redirection_to_long_url_that_doesnt_exists() {
 
     //Act
     let response = client
-        .get(format!("{}/{}", &test_app.base_url, "FOOBAR"))
+        .get(format!("{}{}", &test_app.base_url, "FOOBAR"))
         .send()
         .await
         .expect("Failed to execute request");
 
     // Assert
     assert_eq!(response.status().as_u16(), 404);
+}
+
+#[tokio::test]
+async fn successfully_delete_url() {
+    let mongodb = container_request().start().await.unwrap();
+    let host_ip = mongodb.get_host().await.unwrap();
+    let host_port = mongodb.get_host_port_ipv4(27017.tcp()).await.unwrap();
+    let mongo_uri = format!("mongodb://{host_ip}:{host_port}");
+
+    // Set up indices and DB
+    let test_mongo = set_up_database(mongo_uri.as_str()).await.unwrap();
+
+    let test_app = spawn_app(test_mongo).await.unwrap();
+    let client = reqwest::Client::builder()
+        .redirect(reqwest::redirect::Policy::none())
+        .build()
+        .unwrap();
+
+    let response_one = client
+        .post(&test_app.base_url)
+        .json(&json!({
+            "long_url": "https://www.mongodb.com/docs/drivers/rust/current/fundamentals/indexes/"
+        }))
+        .send()
+        .await
+        .expect("Failed to execute request");
+
+    assert_eq!(response_one.status().as_u16(), 201);
+    let create_response_one: CreateShortUrlResponse = response_one.json().await.unwrap();
+
+    let response_find_one = client
+        .get(create_response_one.short_url().to_owned())
+        .send()
+        .await
+        .expect("Failed to execute request");
+
+    assert_eq!(response_find_one.status().as_u16(), 303);
+
+    let response_deletion = client
+        .delete(create_response_one.short_url().as_str())
+        .send()
+        .await
+        .expect("Failed to execute request");
+
+    assert_eq!(response_deletion.status().as_u16(), 200);
+
+    let response_find_two = client
+        .get(create_response_one.short_url().to_owned())
+        .send()
+        .await
+        .expect("Failed to execute request");
+
+    assert_eq!(response_find_two.status().as_u16(), 404);
+}
+
+#[tokio::test]
+async fn fail_delete_non_existing_url() {
+    let mongodb = container_request().start().await.unwrap();
+    let host_ip = mongodb.get_host().await.unwrap();
+    let host_port = mongodb.get_host_port_ipv4(27017.tcp()).await.unwrap();
+    let mongo_uri = format!("mongodb://{host_ip}:{host_port}");
+
+    // Set up indices and DB
+    let test_mongo = set_up_database(mongo_uri.as_str()).await.unwrap();
+
+    let test_app = spawn_app(test_mongo).await.unwrap();
+    let client = reqwest::Client::new();
+
+    let response_deletion = client
+        .delete(format!("{}{}", &test_app.base_url, "FOOBAR"))
+        .json("")
+        .send()
+        .await
+        .expect("Failed to execute request");
+
+    assert_eq!(response_deletion.status().as_u16(), 404)
 }

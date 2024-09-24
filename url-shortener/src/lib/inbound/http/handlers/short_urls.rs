@@ -35,6 +35,29 @@ impl From<RepositoryShortUrlError> for CreateShortUrlError {
     }
 }
 
+#[derive(thiserror::Error)]
+pub enum DeleteShortUrlError {
+    #[error("short_url not found")]
+    ShortUrlNotFound,
+    #[error("Something went wrong")]
+    UnexpectedError(#[from] anyhow::Error),
+}
+
+impl std::fmt::Debug for DeleteShortUrlError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        error_chain_fmt(self, f)
+    }
+}
+
+impl From<RepositoryShortUrlError> for DeleteShortUrlError {
+    fn from(value: RepositoryShortUrlError) -> Self {
+        match value {
+            RepositoryShortUrlError::ShortUrlNotFound => DeleteShortUrlError::ShortUrlNotFound,
+            error => DeleteShortUrlError::UnexpectedError(anyhow!(error)),
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct CreateShortUrlResponse {
     short_url: Url,
@@ -65,6 +88,15 @@ impl ResponseError for CreateShortUrlError {
         match self {
             CreateShortUrlError::MalformedUrl => StatusCode::BAD_REQUEST,
             UnexpectedError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+        }
+    }
+}
+
+impl ResponseError for DeleteShortUrlError {
+    fn status_code(&self) -> StatusCode {
+        match self {
+            DeleteShortUrlError::ShortUrlNotFound => StatusCode::NOT_FOUND,
+            DeleteShortUrlError::UnexpectedError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 }
@@ -105,11 +137,20 @@ where
     let short_url = url_service.retrieve_short_url(key.to_owned()).await?;
 
     match short_url {
-        None => Ok(HttpResponse::NotFound()
-            .status(StatusCode::CREATED)
-            .json(())),
+        None => Ok(HttpResponse::NotFound().json(())),
         Some(short_url_response) => Ok(HttpResponse::SeeOther()
             .insert_header((LOCATION, short_url_response.long_url().as_str()))
             .finish()),
     }
+}
+
+pub async fn delete_short_url<R>(
+    url_service: web::Data<Service<R>>,
+    key: web::Path<ShortUrlId>,
+) -> Result<HttpResponse, DeleteShortUrlError>
+where
+    R: UrlsRepository,
+{
+    url_service.delete_short_url(key.to_owned()).await?;
+    Ok(HttpResponse::Ok().finish())
 }
