@@ -93,4 +93,20 @@ impl UrlsRepository for MongoDatabase {
 
         Ok(result)
     }
+
+    async fn delete_short_url_by_key(
+        &self,
+        key: ShortUrlId,
+    ) -> Result<(), RepositoryShortUrlError> {
+        let delete_result = self
+            .short_urls_collection()
+            .delete_one(doc! { "key": key.as_ref() })
+            .await?;
+
+        if delete_result.deleted_count > 0 {
+            Ok(())
+        } else {
+            Err(RepositoryShortUrlError::ShortUrlNotFound)
+        }
+    }
 }

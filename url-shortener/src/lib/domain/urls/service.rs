@@ -74,6 +74,11 @@ where
             Some(sh) => Ok(Some(ShortUrlResponse::from(sh, base_url.to_owned())?)),
         }
     }
+
+    async fn delete_short_url(&self, key: ShortUrlId) -> Result<(), RepositoryShortUrlError> {
+        self.repo.delete_short_url_by_key(key).await?;
+        Ok(())
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -113,6 +118,7 @@ mod tests {
             async fn find_short_url_by_long_url(&self, long_url: Url) -> Result<Option<ShortUrl>, RepositoryShortUrlError>;
             async fn find_short_url_by_short_url(&self, short_url: Url) -> Result<Option<ShortUrl>, RepositoryShortUrlError>;
             async fn find_short_url_by_key(&self, key: ShortUrlId) -> Result<Option<ShortUrl>, RepositoryShortUrlError>;
+            async fn delete_short_url_by_key(&self, key: ShortUrlId) -> Result<(), RepositoryShortUrlError>;
         }
 
         impl Clone for MockUrlsRepository {
@@ -321,5 +327,56 @@ mod tests {
         let expected =
             ShortUrlResponse::from(short_url, service_config().base_url.to_owned()).unwrap();
         assert_eq!(result, expected);
+    }
+
+    #[tokio::test]
+    async fn delete_short_url_should_return_not_found_error() {
+        let test_url =
+            Url::parse("https://www.howtocodeit.com/articles/master-hexagonal-architecture-rust")
+                .unwrap();
+        let short_url = ShortUrl::from_long_url(&test_url).unwrap();
+
+        let mut mock_urls_repository = MockMockUrlsRepository::new();
+
+        mock_urls_repository
+            .expect_delete_short_url_by_key()
+            .times(1)
+            .return_once(move |_| Err(RepositoryShortUrlError::ShortUrlNotFound));
+
+        let service_under_test = Service::new(mock_urls_repository, service_config());
+
+        let result = service_under_test
+            .delete_short_url(short_url.key().to_owned())
+            .await
+            .unwrap_err();
+
+        assert_eq!(
+            result.to_string(),
+            RepositoryShortUrlError::ShortUrlNotFound.to_string()
+        );
+    }
+
+    #[tokio::test]
+    async fn delete_short_url_should_succeed() {
+        let test_url =
+            Url::parse("https://www.howtocodeit.com/articles/master-hexagonal-architecture-rust")
+                .unwrap();
+        let short_url = ShortUrl::from_long_url(&test_url).unwrap();
+
+        let mut mock_urls_repository = MockMockUrlsRepository::new();
+
+        mock_urls_repository
+            .expect_delete_short_url_by_key()
+            .times(1)
+            .return_once(move |_| Ok(()));
+
+        let service_under_test = Service::new(mock_urls_repository, service_config());
+
+        let result = service_under_test
+            .delete_short_url(short_url.key().to_owned())
+            .await
+            .unwrap();
+
+        assert_eq!(result, ());
     }
 }
