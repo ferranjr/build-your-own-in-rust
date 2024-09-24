@@ -16,16 +16,11 @@ async fn main() -> anyhow::Result<()> {
 
     // Create Our Service
     let mongo_repository = MongoDatabase::new(mongo, config.mongo_database.as_str());
-
-    let base_url = format!(
-        "{}://{}:{}/",
-        config.server_protocol, config.server_address, config.server_port
-    );
-    let service_config = ServiceConfig::new(3, base_url.as_str());
+    let service_config = ServiceConfig::new(3, config.server_base_url.as_str());
     let urls_service = Service::new(mongo_repository, service_config);
 
     // Create HttpServer
-    let tcp_listener = TcpListener::bind(base_url)?;
+    let tcp_listener = TcpListener::bind(format!("0.0.0.0:{}", config.server_port))?;
     let http_server = HttpServer::new(urls_service, tcp_listener).await?;
 
     http_server.run_until_stopped().await?;
