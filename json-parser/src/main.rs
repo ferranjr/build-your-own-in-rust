@@ -1,7 +1,6 @@
-use std::io;
-
 use anyhow::{Context, Result};
 use json_parser::parser::parse;
+use std::io;
 
 fn read_input() -> Result<String> {
     let mut raw_input = String::new();
@@ -12,7 +11,6 @@ fn read_input() -> Result<String> {
 
     Ok(raw_input)
 }
-
 
 pub fn repl() {
     loop {

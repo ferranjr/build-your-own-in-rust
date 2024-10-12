@@ -58,7 +58,7 @@ fn parse_json_object(tokens: &mut Vec<Token>) -> Result<JsonAST, String> {
         if token == Token::RightBrace {
             break;
         }
-        let mut item_key = String::new();
+        let item_key: String;
         // We need to find key values here, so first thing is a String followed by colon
         if let Token::TString(key) = token {
             item_key = key;
@@ -194,10 +194,11 @@ mod tests {
             ))
         )
     }
-    
+
     #[test]
-    fn valid_2_json_step_4_should_succeed () {
-        let result = parse("
+    fn valid_2_json_step_4_should_succeed() {
+        let result = parse(
+            "
             {
                 \"key\": \"value\",
                 \"key-n\": 101,
@@ -206,18 +207,48 @@ mod tests {
                 },
                 \"key-l\": [\"list value\"]
             }
-        ").unwrap();
+        ",
+        )
+        .unwrap();
         assert_eq!(
             result,
             JsonAST::JObject(vec!(
                 ("key".to_string(), JsonAST::JString("value".to_string())),
                 ("key-n".to_string(), JsonAST::JNumber(101.into())),
-                ("key-o".to_string(), JsonAST::JObject(
-                    vec!(
-                        ("inner key".to_string(), JsonAST::JString("inner value".to_string()))
-                    )
-                )),
-                ("key-l".to_string(), JsonAST::JArray(vec!(JsonAST::JString("list value".to_string()))))
+                (
+                    "key-o".to_string(),
+                    JsonAST::JObject(vec!((
+                        "inner key".to_string(),
+                        JsonAST::JString("inner value".to_string())
+                    )))
+                ),
+                (
+                    "key-l".to_string(),
+                    JsonAST::JArray(vec!(JsonAST::JString("list value".to_string())))
+                )
+            ))
+        )
+    }
+    #[test]
+    fn valid_json_step_4_should_succeed() {
+        let result = parse(
+            "
+            {
+                \"key\": \"value\",
+                \"key-n\": 101,
+                \"key-o\": {},
+                \"key-l\": []
+            }
+        ",
+        )
+        .unwrap();
+        assert_eq!(
+            result,
+            JsonAST::JObject(vec!(
+                ("key".to_string(), JsonAST::JString("value".to_string())),
+                ("key-n".to_string(), JsonAST::JNumber(101.into())),
+                ("key-o".to_string(), JsonAST::JObject(Vec::new())),
+                ("key-l".to_string(), JsonAST::JArray(Vec::new()))
             ))
         )
     }

@@ -53,7 +53,7 @@ pub fn tokenize(input: &str) -> Result<Vec<Token>, String> {
             'n' => i = tokenize_null(&input, &mut tokens, i)?,
             't' => i = tokenize_true(&input, &mut tokens, i)?,
             'f' => i = tokenize_false(&input, &mut tokens, i)?,
-            ' ' | '\n' | '\t' | '\r' => i = skip_whitespaces(&input, &mut tokens, i),
+            ' ' | '\n' | '\t' | '\r' => i = skip_whitespaces(&input, i),
             '"' => i = tokenize_string(&input, &mut tokens, i)?,
             str => return Err(format!("Unrecognised token {:}", str)),
         }
@@ -63,10 +63,10 @@ pub fn tokenize(input: &str) -> Result<Vec<Token>, String> {
     Ok(tokens)
 }
 
-fn tokenize_number(input: &Vec<char>, tokens: &mut Vec<Token>, i: usize) -> Result<usize, String> {
+fn tokenize_number(input: &[char], tokens: &mut Vec<Token>, i: usize) -> Result<usize, String> {
     let mut i = i;
     let mut tmp = String::new();
-    while ('0'..='9').contains(&input[i]) || input[i] == '.' {
+    while input[i].is_ascii_digit() || input[i] == '.' {
         tmp.push(input[i]);
         i += 1;
     }
@@ -75,7 +75,7 @@ fn tokenize_number(input: &Vec<char>, tokens: &mut Vec<Token>, i: usize) -> Resu
     Ok(i - 1)
 }
 
-fn tokenize_null(input: &Vec<char>, tokens: &mut Vec<Token>, i: usize) -> Result<usize, String> {
+fn tokenize_null(input: &[char], tokens: &mut Vec<Token>, i: usize) -> Result<usize, String> {
     if input[i..i + 4] == ['n', 'u', 'l', 'l'] {
         tokens.push(Token::Null);
         Ok(i + 3)
@@ -84,7 +84,7 @@ fn tokenize_null(input: &Vec<char>, tokens: &mut Vec<Token>, i: usize) -> Result
     }
 }
 
-fn tokenize_true(input: &Vec<char>, tokens: &mut Vec<Token>, i: usize) -> Result<usize, String> {
+fn tokenize_true(input: &[char], tokens: &mut Vec<Token>, i: usize) -> Result<usize, String> {
     if input[i..i + 4] == ['t', 'r', 'u', 'e'] {
         tokens.push(Token::True);
         Ok(i + 3)
@@ -93,7 +93,7 @@ fn tokenize_true(input: &Vec<char>, tokens: &mut Vec<Token>, i: usize) -> Result
     }
 }
 
-fn tokenize_false(input: &Vec<char>, tokens: &mut Vec<Token>, i: usize) -> Result<usize, String> {
+fn tokenize_false(input: &[char], tokens: &mut Vec<Token>, i: usize) -> Result<usize, String> {
     if input[i..i + 5] == ['f', 'a', 'l', 's', 'e'] {
         tokens.push(Token::False);
         Ok(i + 4)
@@ -102,7 +102,7 @@ fn tokenize_false(input: &Vec<char>, tokens: &mut Vec<Token>, i: usize) -> Resul
     }
 }
 
-fn skip_whitespaces(input: &Vec<char>, tokens: &mut Vec<Token>, i: usize) -> usize {
+fn skip_whitespaces(input: &[char], i: usize) -> usize {
     let mut i = i;
     while i < input.len() && input[i] == ' '
         || input[i] == '\n'
@@ -114,7 +114,7 @@ fn skip_whitespaces(input: &Vec<char>, tokens: &mut Vec<Token>, i: usize) -> usi
     i - 1
 }
 
-fn tokenize_string(input: &Vec<char>, tokens: &mut Vec<Token>, i: usize) -> Result<usize, String> {
+fn tokenize_string(input: &[char], tokens: &mut Vec<Token>, i: usize) -> Result<usize, String> {
     let mut i = i + 1;
     let mut str = String::new();
     while i < input.len() && input[i] != '"' {
@@ -168,10 +168,7 @@ mod tests {
         ",
         )
         .expect("should extract tokens");
-        assert_eq!(
-            result,
-            vec!(Token::LeftBrace, Token::RightBrace)
-        )
+        assert_eq!(result, vec!(Token::LeftBrace, Token::RightBrace))
     }
 
     #[test]
