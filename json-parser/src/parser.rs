@@ -120,7 +120,14 @@ pub fn parse(input: &str) -> Result<JsonAST, String> {
     let token_result = tokenize(input)?;
     let mut tokens = token_result.into_iter().rev().collect();
 
-    parse_token_list(&mut tokens)
+    let result = parse_token_list(&mut tokens);
+
+    // If there are other tokens we should fail as it is a malformed json
+    if tokens.pop().is_some() {
+        Err("Unexpected tokens found after whole Json was defined".to_string())
+    } else {
+        result
+    }
 }
 
 #[cfg(test)]
@@ -251,5 +258,22 @@ mod tests {
                 ("key-l".to_string(), JsonAST::JArray(Vec::new()))
             ))
         )
+    }
+
+    #[test]
+    fn valid_json_step_4_followed_by_more_input_should_fail() {
+        let result = parse(
+            "
+            {
+                \"key\": \"value\",
+                \"key-n\": 101,
+                \"key-o\": {},
+                \"key-l\": []
+            } \"aloha\"
+        ",
+        )
+        .err()
+        .unwrap();
+        assert!(result.contains("Unexpected tokens found after whole Json was defined"))
     }
 }
