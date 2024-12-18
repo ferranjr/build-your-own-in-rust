@@ -10,6 +10,7 @@ use actix_web::{web, HttpResponse, ResponseError};
 use anyhow::anyhow;
 use serde::{Deserialize, Serialize};
 use std::fmt::Formatter;
+use tracing::instrument;
 use url::Url;
 
 #[derive(thiserror::Error)]
@@ -111,6 +112,7 @@ pub fn error_chain_fmt(e: &impl std::error::Error, f: &mut Formatter<'_>) -> std
     Ok(())
 }
 
+#[instrument(skip(url_service))]
 pub async fn create_short_url<R>(
     url_service: web::Data<Service<R>>,
     request: web::Json<CreateShortUrlRequest>,
@@ -127,6 +129,7 @@ where
         .json(response))
 }
 
+#[instrument(skip(url_service))]
 pub async fn get_short_url<R>(
     url_service: web::Data<Service<R>>,
     key: web::Path<ShortUrlId>,
@@ -144,6 +147,7 @@ where
     }
 }
 
+#[instrument(skip(url_service))]
 pub async fn delete_short_url<R>(
     url_service: web::Data<Service<R>>,
     key: web::Path<ShortUrlId>,

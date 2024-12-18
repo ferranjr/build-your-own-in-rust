@@ -2,6 +2,7 @@ use crate::domain::urls::models::short_url::{RepositoryShortUrlError, ShortUrl, 
 use crate::domain::urls::ports::UrlsRepository;
 use mongodb::bson::doc;
 use mongodb::{Client, Collection, Database};
+use tracing::instrument;
 use url::Url;
 
 #[derive(Debug, Clone)]
@@ -41,6 +42,7 @@ impl MongoDatabase {
 }
 
 impl UrlsRepository for MongoDatabase {
+    #[instrument(skip(self))]
     async fn create_short_url(
         &self,
         short_url: ShortUrl,
@@ -58,6 +60,7 @@ impl UrlsRepository for MongoDatabase {
             })?
     }
 
+    #[instrument(skip(self))]
     async fn find_short_url_by_long_url(
         &self,
         long_url: Url,
@@ -70,6 +73,7 @@ impl UrlsRepository for MongoDatabase {
         Ok(result)
     }
 
+    #[instrument(skip(self))]
     async fn find_short_url_by_short_url(
         &self,
         short_url: Url,
@@ -82,6 +86,7 @@ impl UrlsRepository for MongoDatabase {
         Ok(result)
     }
 
+    #[instrument(skip(self))]
     async fn find_short_url_by_key(
         &self,
         key: ShortUrlId,
@@ -94,6 +99,7 @@ impl UrlsRepository for MongoDatabase {
         Ok(result)
     }
 
+    #[instrument(skip(self))]
     async fn delete_short_url_by_key(
         &self,
         key: ShortUrlId,

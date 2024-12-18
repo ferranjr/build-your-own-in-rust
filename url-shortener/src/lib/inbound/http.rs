@@ -6,6 +6,7 @@ use actix_web::dev::Server;
 use actix_web::web::Data;
 use actix_web::{web, App};
 use std::net::TcpListener;
+use tracing::info;
 
 pub struct HttpServer {
     server: Server,
@@ -33,6 +34,13 @@ async fn run<R>(
 where
     R: UrlsRepository,
 {
+    let address = tcp_listener.local_addr()?;
+    info!(
+        "Starting server at host {} and port {}",
+        address.ip(),
+        address.port(),
+    );
+
     let server = actix_web::HttpServer::new(move || {
         App::new()
             .app_data(Data::new(urls_service.clone()))

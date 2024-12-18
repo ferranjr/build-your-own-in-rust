@@ -8,6 +8,7 @@ use url_shortener::outbound::mongo::{MongoClient, MongoDatabase};
 async fn main() -> anyhow::Result<()> {
     std::env::set_var("RUST_LOG", "debug");
     env_logger::init();
+    tracing_subscriber::fmt::init();
 
     let config = Config::from_env()?;
 
