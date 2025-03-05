@@ -1,4 +1,3 @@
-use derive_more::From;
 use mongodb::error::Error;
 use nanoid::nanoid;
 use serde::{Deserialize, Serialize};
