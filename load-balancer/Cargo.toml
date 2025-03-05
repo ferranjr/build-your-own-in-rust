@@ -4,3 +4,9 @@ members = [
     "load-balancer",
     "server"
 ]
+
+[workspace.dependencies]
+tokio = { version = "1.43.0", features = ["full"] }
+http-body-util = "0.1.2"
+hyper = { version = "1.6.0", features = ["full"] }
+hyper-util = { version = "0.1.10", features = ["full"] }
