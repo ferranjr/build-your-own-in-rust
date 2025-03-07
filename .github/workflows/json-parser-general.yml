@@ -37,7 +37,7 @@ jobs:
       - name: Rust Cache Action
         uses: Swatinem/rust-cache@v2
         with:
-          workspaces: . -> json-parser
+          workspaces: json-parser
 
       - name: Run tests
         run: cargo test
@@ -69,7 +69,7 @@ jobs:
           components: clippy
       - uses: Swatinem/rust-cache@v2
         with:
-          workspaces: . -> json-parser
+          workspaces: json-parser
       - name: Linting
         run: cargo clippy -- -D warnings
         working-directory: ./json-parser
