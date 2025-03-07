@@ -14,7 +14,6 @@ path = "src/bin/server/main.rs"
 [dependencies]
 nanoid = "0.4.0"
 anyhow = { version = "1.0.97", features = ["default"] }
-derive_more = { version = "2.0.1", features = ["from"] }
 thiserror = "2.0.12"
 url = { version = "2.5.4", features = ["serde"] }
 tokio = "1.43.0"
