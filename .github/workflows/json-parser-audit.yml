@@ -1,4 +1,4 @@
-name: Security Audit Load Balancer
+name: Security Audit Json Parser
 on:
   schedule:
     - cron: '0 0 * * *'
