@@ -2,9 +2,9 @@
 name: Web Server General
 
 on:
-  push:
-    paths:
-      - 'web-server/**'
+#  push:
+#    paths:
+#      - 'web-server/**'
   pull_request:
     paths:
       - 'web-server/**'

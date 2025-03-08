@@ -2,9 +2,9 @@
 name: Url Shortener General
 
 on:
-  push:
-    paths:
-      - 'url-shortener/**'
+#  push:
+#    paths:
+#      - 'url-shortener/**'
   pull_request:
     paths:
       - 'url-shortener/**'
