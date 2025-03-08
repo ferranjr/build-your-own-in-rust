@@ -20,7 +20,7 @@ impl HealthChecker {
             let result = {
                 let address = server.read().await.check_status_address();
                 reqwest::Client::builder()
-                    .timeout(Duration::from_millis(500))
+                    .timeout(Duration::from_millis(100))
                     .build()
                     .unwrap()
                     .get(address)
