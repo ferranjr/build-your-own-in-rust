@@ -6,6 +6,9 @@ on:
     paths:
       - 'url-shortener/**/Cargo.toml'
       - 'url-shortener/**/Cargo.lock'
+  workflow_dispatch:
+    paths:
+      - 'url-shortener/**'
 jobs:
   security_audit:
     runs-on: ubuntu-latest

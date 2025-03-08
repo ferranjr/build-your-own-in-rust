@@ -2,9 +2,9 @@
 name: Json Parser General
 
 on:
-  push:
-    paths:
-      - 'json-parser/**'
+#  push:
+#    paths:
+#      - 'json-parser/**'
   pull_request:
     paths:
       - 'json-parser/**'

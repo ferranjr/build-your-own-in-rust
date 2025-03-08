@@ -4,11 +4,11 @@ on:
     - cron: '0 0 * * *'
   push:
     paths:
-      - 'load-balancer/**/Cargo.toml'
-      - 'load-balancer/**/Cargo.lock'
+      - 'json-parser/**/Cargo.toml'
+      - 'json-parser/**/Cargo.lock'
   workflow_dispatch:
     paths:
-      - 'load-balancer/**'
+      - 'json-parser/**'
 jobs:
   security_audit:
     runs-on: ubuntu-latest
@@ -17,4 +17,4 @@ jobs:
       - uses: taiki-e/install-action@cargo-deny
       - name: Scan for vulnerabilities
         run: cargo deny check advisories
-        working-directory: ./load-balancer
+        working-directory: ./json-parser

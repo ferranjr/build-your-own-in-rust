@@ -2,9 +2,9 @@
 name: Load Balancer General
 
 on:
-  push:
-    paths:
-      - 'load-balancer/**'
+#  push:
+#    paths:
+#      - 'load-balancer/**'
   pull_request:
     paths:
       - 'load-balancer/**'
