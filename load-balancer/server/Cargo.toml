@@ -12,4 +12,4 @@ hyper = { workspace = true }
 hyper-util = { workspace = true }
 
 [dev-dependencies]
-reqwest = "0.12.12"
+reqwest = "0.12.14"
