@@ -1,4 +1,4 @@
-use http_body_util::{combinators::BoxBody, BodyExt};
+use http_body_util::{BodyExt, combinators::BoxBody};
 use hyper::body::Bytes;
 use hyper::client::conn::http1::Builder;
 use hyper::{Request, Response};

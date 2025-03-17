@@ -16,28 +16,24 @@ impl HealthChecker {
     }
 
     pub async fn healthcheck(server: Arc<RwLock<Server>>) {
+        let client = reqwest::Client::builder()
+            .timeout(Duration::from_millis(50))
+            .build()
+            .unwrap();
+
         loop {
             let result = {
                 let address = server.read().await.check_status_address();
-                reqwest::Client::builder()
-                    .timeout(Duration::from_millis(250))
-                    .build()
-                    .unwrap()
-                    .get(address)
-                    .send()
-                    .await
+                client.get(address).send().await
             };
 
             let mut server = server.write().await;
-            match result {
-                Ok(res) => {
-                    server.healthy = res.status().is_success();
-                }
-                Err(_) => {
-                    server.healthy = false;
-                }
-            }
-            time::sleep(Duration::from_millis(200)).await;
+            server.healthy = match result {
+                Ok(res) => res.status().is_success(),
+                Err(_) => false,
+            };
+
+            time::sleep(Duration::from_millis(50)).await;
         }
     }
 }

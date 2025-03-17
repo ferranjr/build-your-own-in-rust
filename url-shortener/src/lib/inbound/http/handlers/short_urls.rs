@@ -4,9 +4,9 @@ use crate::domain::urls::models::short_url::{
 use crate::domain::urls::ports::{UrlsRepository, UrlsService};
 use crate::domain::urls::service::Service;
 use crate::inbound::http::handlers::short_urls::CreateShortUrlError::UnexpectedError;
-use actix_web::http::header::LOCATION;
 use actix_web::http::StatusCode;
-use actix_web::{web, HttpResponse, ResponseError};
+use actix_web::http::header::LOCATION;
+use actix_web::{HttpResponse, ResponseError, web};
 use anyhow::anyhow;
 use serde::{Deserialize, Serialize};
 use std::fmt::Formatter;

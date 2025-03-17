@@ -68,9 +68,6 @@ async fn spawn_app(test_servers: Vec<SocketAddr>) -> Result<TestApp, Box<dyn std
     let local_address = listener.local_addr().unwrap();
     let address = local_address.ip().to_string();
     let port = local_address.port();
-
-    println!("Starting app at port {}", &port);
-
     let targets = Arc::new(Mutex::new(Targets::new(test_servers)));
 
     // Initialises the monitoring of targets
@@ -84,7 +81,7 @@ async fn spawn_app(test_servers: Vec<SocketAddr>) -> Result<TestApp, Box<dyn std
     });
 
     // Sleep first to ensure healthcheck initialises al servers
-    time::sleep(Duration::from_millis(300)).await;
+    time::sleep(Duration::from_millis(500)).await;
 
     Ok(TestApp { address, port })
 }

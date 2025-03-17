@@ -1,5 +1,5 @@
-use std::net::TcpListener;
 use env_logger::Env;
+use std::net::TcpListener;
 use url_shortener::config::Config;
 use url_shortener::domain::urls::service::{Service, ServiceConfig};
 use url_shortener::inbound::http::HttpServer;
