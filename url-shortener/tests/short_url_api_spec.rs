@@ -10,8 +10,8 @@ use testcontainers::{ContainerRequest, ImageExt};
 use testcontainers_modules::mongo::Mongo;
 use url_shortener::domain::urls::models::short_url::ShortUrl;
 use url_shortener::domain::urls::service::ServiceConfig;
-use url_shortener::inbound::http::handlers::short_urls::CreateShortUrlResponse;
 use url_shortener::inbound::http::HttpServer;
+use url_shortener::inbound::http::handlers::short_urls::CreateShortUrlResponse;
 use url_shortener::outbound::mongo::{MongoClient, MongoDatabase};
 
 #[derive(Debug)]
@@ -136,11 +136,13 @@ async fn fail_with_400_for_non_valid_urls() {
 
     // Assert
     assert_eq!(response.status().as_u16(), 400);
-    assert!(response
-        .text()
-        .await
-        .unwrap()
-        .contains("Json deserialize error"));
+    assert!(
+        response
+            .text()
+            .await
+            .unwrap()
+            .contains("Json deserialize error")
+    );
 }
 
 #[tokio::test]

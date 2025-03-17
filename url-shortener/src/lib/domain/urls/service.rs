@@ -54,7 +54,7 @@ where
                     return Ok(ShortUrlResponse::from(
                         value,
                         self.config.base_url.to_owned(),
-                    )?)
+                    )?);
                 }
                 Err(RepositoryShortUrlError::Duplicate { .. }) if retries > 0 => retries -= 1,
                 Err(error) => return Err(error),
