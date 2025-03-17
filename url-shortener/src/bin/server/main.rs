@@ -1,4 +1,5 @@
 use std::net::TcpListener;
+use env_logger::Env;
 use url_shortener::config::Config;
 use url_shortener::domain::urls::service::{Service, ServiceConfig};
 use url_shortener::inbound::http::HttpServer;
@@ -6,7 +7,7 @@ use url_shortener::outbound::mongo::{MongoClient, MongoDatabase};
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    std::env::set_var("RUST_LOG", "debug");
+    Env::new().default_filter_or("debug");
     env_logger::init();
     tracing_subscriber::fmt::init();
 
