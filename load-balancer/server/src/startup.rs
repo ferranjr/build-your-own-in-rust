@@ -5,12 +5,13 @@ use hyper::service::service_fn;
 use hyper::{Method, Request, Response, StatusCode};
 use hyper_util::rt::TokioIo;
 use tokio::net::TcpListener;
+use tracing::{error, info, instrument};
 
 pub async fn run(
     tcp_listener: TcpListener,
     name: String,
 ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    println!(
+    info!(
         "Starting server at: {}:{}",
         &tcp_listener.local_addr()?.ip().to_string(),
         tcp_listener.local_addr()?.port()
@@ -23,16 +24,17 @@ pub async fn run(
         let name = name.clone();
         tokio::task::spawn(async move {
             if let Err(err) = http1::Builder::new()
-                // `service_fn` converts our function in a `Service`
+                // `service_fn` converts our function into a `Service`
                 .serve_connection(io, service_fn(|r| request_handler(r, name.as_str())))
                 .await
             {
-                println!("Error serving connection: {:?}", err);
+                error!("Error serving connection: {:?}", err);
             }
         });
     }
 }
 
+#[instrument()]
 async fn request_handler(
     req: Request<hyper::body::Incoming>,
     name: &str,

@@ -3,6 +3,7 @@ use std::sync::Arc;
 use std::time::Duration;
 use tokio::sync::{Mutex, RwLock};
 use tokio::time;
+use tracing::error;
 
 pub struct HealthChecker {}
 
@@ -21,16 +22,19 @@ impl HealthChecker {
             .build()
             .unwrap();
 
+        let base_url = server.read().await.uri.to_string();
+        let address = server.read().await.check_status_address();
+
         loop {
-            let result = {
-                let address = server.read().await.check_status_address();
-                client.get(address).send().await
-            };
+            let result = client.get(address.clone()).send().await;
 
             let mut server = server.write().await;
             server.healthy = match result {
                 Ok(res) => res.status().is_success(),
-                Err(_) => false,
+                Err(_) => {
+                    error!("Unable to check status {}", base_url);
+                    false
+                }
             };
 
             time::sleep(Duration::from_millis(50)).await;

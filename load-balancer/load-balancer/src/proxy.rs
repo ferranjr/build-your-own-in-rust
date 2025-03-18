@@ -5,7 +5,9 @@ use hyper::{Request, Response};
 use hyper_util::rt::TokioIo;
 use std::net::SocketAddr;
 use tokio::net::TcpStream;
+use tracing::{error, instrument};
 
+#[instrument()]
 pub async fn pipe_through(
     req: Request<hyper::body::Incoming>,
     target: &SocketAddr,
@@ -17,7 +19,7 @@ pub async fn pipe_through(
 
     tokio::task::spawn(async move {
         if let Err(err) = conn.await {
-            println!("Connection failed: {:?}", err);
+            error!("Connection failed: {:?}", err);
         }
     });
 

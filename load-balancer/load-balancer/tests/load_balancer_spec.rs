@@ -8,6 +8,7 @@ use std::time::Duration;
 use tokio::net::TcpListener;
 use tokio::sync::Mutex;
 use tokio::time;
+use tracing::info;
 
 #[derive(Debug)]
 struct TestApp {
@@ -46,7 +47,7 @@ async fn spawn_server(name: String) -> std::io::Result<TestServer> {
     let address = local_address.ip().to_string();
     let port = local_address.port();
 
-    println!("Starting server {} at port {}", &name, &port);
+    info!("Starting server {} at port {}", &name, &port);
 
     let name_2 = name.clone();
     tokio::task::spawn(async move {

@@ -6,12 +6,13 @@ use hyper_util::rt::TokioIo;
 use std::sync::Arc;
 use tokio::net::TcpListener;
 use tokio::sync::Mutex;
+use tracing::{error, info};
 
 pub async fn run(
     tcp_listener: TcpListener,
     targets: Arc<Mutex<Targets>>,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    println!(
+    info!(
         "Starting load balancer at: {}:{}",
         &tcp_listener.local_addr()?.ip().to_string(),
         tcp_listener.local_addr()?.port()
@@ -27,7 +28,7 @@ pub async fn run(
                 .serve_connection(io, service_fn(|r| pipe_through(r, &target)))
                 .await
             {
-                println!("Error serving connection: {:?}", err);
+                error!("Error serving connection: {:?}", err);
             }
         });
     }
