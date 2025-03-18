@@ -3,7 +3,7 @@ use std::sync::Arc;
 use std::time::Duration;
 use tokio::sync::{Mutex, RwLock};
 use tokio::time;
-use tracing::error;
+use tracing::{error, info};
 
 pub struct HealthChecker {}
 
@@ -30,9 +30,17 @@ impl HealthChecker {
 
             let mut server = server.write().await;
             server.healthy = match result {
-                Ok(res) => res.status().is_success(),
+                Ok(res) => {
+                    let result = res.status().is_success();
+                    if !server.healthy {
+                        info!("Server is back up: {}", base_url);
+                    }
+                    result
+                }
                 Err(_) => {
-                    error!("Unable to check status {}", base_url);
+                    if server.healthy {
+                        error!("Server gone down, unable to check status: {}", base_url);
+                    }
                     false
                 }
             };
