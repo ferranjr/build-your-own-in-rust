@@ -1,4 +1,4 @@
-use crate::lexer::{tokenize, Token};
+use crate::lexer::{Token, tokenize};
 use std::fmt::Formatter;
 
 #[derive(Debug, Clone, PartialEq)]
@@ -132,7 +132,7 @@ pub fn parse(input: &str) -> Result<JsonAST, String> {
 
 #[cfg(test)]
 mod tests {
-    use crate::parser::{parse, JsonAST};
+    use crate::parser::{JsonAST, parse};
 
     #[test]
     fn invalid_empty_json_should_fail() {

@@ -131,7 +131,7 @@ fn tokenize_string(input: &[char], tokens: &mut Vec<Token>, i: usize) -> Result<
 
 #[cfg(test)]
 mod tests {
-    use crate::lexer::{tokenize, Token};
+    use crate::lexer::{Token, tokenize};
 
     #[test]
     fn tokenize_should_correctly_deal_with_known_tokens() {
