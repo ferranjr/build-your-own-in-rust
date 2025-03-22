@@ -1,30 +1,11 @@
 use crate::lexer::{Token, tokenize};
-use std::fmt::Formatter;
+use crate::parser::domain::JsonAST;
+use domain::ParserError;
+use domain::Result;
 
-#[derive(Debug, Clone, PartialEq)]
-pub enum JsonAST {
-    JObject(Vec<(String, JsonAST)>),
-    JArray(Vec<JsonAST>),
-    JString(String),
-    JBoolean(bool),
-    JNumber(f64),
-    JNull,
-}
+mod domain;
 
-impl std::fmt::Display for JsonAST {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        match self {
-            JsonAST::JObject(elements) => write!(f, "{{ {:?} }}", elements),
-            JsonAST::JArray(_) => write!(f, "[]"),
-            JsonAST::JString(s) => write!(f, "\"{}\"", s),
-            JsonAST::JBoolean(b) => write!(f, "{}", if *b { "true" } else { "false" }),
-            JsonAST::JNumber(n) => write!(f, "{}", n),
-            JsonAST::JNull => write!(f, "null"),
-        }
-    }
-}
-
-fn parse_array(tokens: &mut Vec<Token>) -> Result<JsonAST, String> {
+fn parse_array(tokens: &mut Vec<Token>) -> Result<JsonAST> {
     let mut list: Vec<JsonAST> = Vec::new();
 
     loop {
@@ -47,36 +28,36 @@ fn parse_array(tokens: &mut Vec<Token>) -> Result<JsonAST, String> {
         }
     }
 
-    Ok(JsonAST::JArray(list))
+    Ok(JsonAST::Array(list))
 }
 
-fn parse_json_object(tokens: &mut Vec<Token>) -> Result<JsonAST, String> {
+fn parse_json_object(tokens: &mut Vec<Token>) -> Result<JsonAST> {
     let mut obj: Vec<(String, JsonAST)> = Vec::new();
 
     loop {
-        let token = tokens.pop().expect("Unexpected end for JsonObject");
+        let token = tokens.pop().ok_or(ParserError::UnexpectedEOF)?;
         if token == Token::RightBrace {
             break;
         }
         let item_key: String;
         // We need to find key values here, so first thing is a String followed by colon
-        if let Token::TString(key) = token {
+        if let Token::String(key) = token {
             item_key = key;
         } else {
-            return Err("Expected a key".to_string());
+            return Err(ParserError::ExpectedKey(token));
         }
         // Next should be the `:`
-        let token = tokens.pop().expect("Unexpected end for JsonObject");
+        let token = tokens.pop().ok_or(ParserError::UnexpectedEOF)?;
         if token != Token::Colon {
-            return Err(format!("Expected `:` but found {}", token));
+            return Err(ParserError::ExpectedTokenMismatch(token, Token::Colon));
         }
         // Next should be a JsonAST
-        let token = tokens.pop().expect("Unexpected end for JsonObject");
+        let token = tokens.pop().ok_or(ParserError::UnexpectedEOF)?;
         let value = parse_json_value(tokens, token)?;
         obj.push((item_key, value));
 
         // Now we should check for a comma or end of jsonObject
-        let token = tokens.pop().expect("Unexpected end for JsonObject");
+        let token = tokens.pop().ok_or(ParserError::UnexpectedEOF)?;
         if token == Token::RightBrace {
             break;
         }
@@ -85,46 +66,46 @@ fn parse_json_object(tokens: &mut Vec<Token>) -> Result<JsonAST, String> {
         }
     }
 
-    Ok(JsonAST::JObject(obj))
+    Ok(JsonAST::Object(obj))
 }
 
-fn parse_json_value(tokens: &mut Vec<Token>, token: Token) -> Result<JsonAST, String> {
+fn parse_json_value(tokens: &mut Vec<Token>, token: Token) -> Result<JsonAST> {
     match token {
-        Token::Null => Ok(JsonAST::JNull),
-        Token::True => Ok(JsonAST::JBoolean(true)),
-        Token::False => Ok(JsonAST::JBoolean(false)),
-        Token::Number(n) => Ok(JsonAST::JNumber(n)),
-        Token::TString(s) => Ok(JsonAST::JString(s)),
+        Token::Null => Ok(JsonAST::Null),
+        Token::True => Ok(JsonAST::Boolean(true)),
+        Token::False => Ok(JsonAST::Boolean(false)),
+        Token::Number(n) => Ok(JsonAST::Number(n)),
+        Token::String(s) => Ok(JsonAST::String(s)),
         Token::LeftBrace => parse_json_object(tokens),
         Token::LeftBracket => parse_array(tokens),
-        t => Err(format!("Unexpected token {} found", t)),
+        t => Err(ParserError::UnexpectedToken(t)),
     }
 }
 
-fn parse_token_list(tokens: &mut Vec<Token>) -> Result<JsonAST, String> {
+fn parse_token_list(tokens: &mut Vec<Token>) -> Result<JsonAST> {
     let token = tokens.pop();
 
     if token == Some(Token::LeftBrace) {
         parse_json_object(tokens)
     } else if token == Some(Token::LeftBracket) {
         parse_array(tokens)
+    } else if let Some(t) = token {
+        Err(ParserError::UnexpectedToken(t))
     } else {
-        Err(format!(
-            "Malformed JSON, expecting `{{` or `[` but got `{:?}`",
-            token
-        ))
+        Err(ParserError::UnexpectedEOF)
     }
 }
 
-pub fn parse(input: &str) -> Result<JsonAST, String> {
+pub fn parse(input: &str) -> Result<JsonAST> {
     let token_result = tokenize(input)?;
+
     let mut tokens = token_result.into_iter().rev().collect();
 
     let result = parse_token_list(&mut tokens);
 
     // If there are other tokens we should fail as it is a malformed json
-    if tokens.pop().is_some() {
-        Err("Unexpected tokens found after whole Json was defined".to_string())
+    if let Some(t) = tokens.pop() {
+        Err(ParserError::UnexpectedTokenAfterEOF(t))
     } else {
         result
     }
@@ -132,18 +113,20 @@ pub fn parse(input: &str) -> Result<JsonAST, String> {
 
 #[cfg(test)]
 mod tests {
+    use crate::lexer::Token;
+    use crate::parser::domain::ParserError;
     use crate::parser::{JsonAST, parse};
 
     #[test]
     fn invalid_empty_json_should_fail() {
         let result = parse("").err().unwrap();
-        assert!(result.contains("Malformed JSON"))
+        assert_eq!(result, ParserError::UnexpectedEOF);
     }
 
     #[test]
     fn valid_empty_json_should_succeed() {
         let result = parse("{}").unwrap();
-        assert_eq!(result, JsonAST::JObject(Vec::new()))
+        assert_eq!(result, JsonAST::Object(Vec::new()))
     }
 
     #[test]
@@ -151,7 +134,7 @@ mod tests {
         let result = parse("{ \"foo\": 12}").unwrap();
         assert_eq!(
             result,
-            JsonAST::JObject(vec!(("foo".to_string(), JsonAST::JNumber(12.into()))))
+            JsonAST::Object(vec!(("foo".to_string(), JsonAST::Number(12.into()))))
         )
     }
 
@@ -160,9 +143,9 @@ mod tests {
         let result = parse("{\"foo\": 12,\"bar\": \"aloha\"}").unwrap();
         assert_eq!(
             result,
-            JsonAST::JObject(vec!(
-                ("foo".to_string(), JsonAST::JNumber(12.into())),
-                ("bar".to_string(), JsonAST::JString("aloha".to_string()))
+            JsonAST::Object(vec!(
+                ("foo".to_string(), JsonAST::Number(12.into())),
+                ("bar".to_string(), JsonAST::String("aloha".to_string()))
             ))
         )
     }
@@ -174,15 +157,15 @@ mod tests {
                 .unwrap();
         assert_eq!(
             result,
-            JsonAST::JObject(vec!(
-                ("foo".to_string(), JsonAST::JNumber(12.into())),
-                ("bar".to_string(), JsonAST::JString("aloha".to_string())),
+            JsonAST::Object(vec!(
+                ("foo".to_string(), JsonAST::Number(12.into())),
+                ("bar".to_string(), JsonAST::String("aloha".to_string())),
                 (
                     "baz".to_string(),
-                    JsonAST::JArray(vec!(
-                        JsonAST::JString("foo".to_string()),
-                        JsonAST::JString("bar".to_string()),
-                        JsonAST::JString("baz".to_string())
+                    JsonAST::Array(vec!(
+                        JsonAST::String("foo".to_string()),
+                        JsonAST::String("bar".to_string()),
+                        JsonAST::String("baz".to_string())
                     ))
                 ),
             ))
@@ -194,10 +177,10 @@ mod tests {
         let result = parse("[ \"foo\", \"bar\", \"baz\"]").unwrap();
         assert_eq!(
             result,
-            JsonAST::JArray(vec!(
-                JsonAST::JString("foo".to_string()),
-                JsonAST::JString("bar".to_string()),
-                JsonAST::JString("baz".to_string())
+            JsonAST::Array(vec!(
+                JsonAST::String("foo".to_string()),
+                JsonAST::String("bar".to_string()),
+                JsonAST::String("baz".to_string())
             ))
         )
     }
@@ -219,19 +202,19 @@ mod tests {
         .unwrap();
         assert_eq!(
             result,
-            JsonAST::JObject(vec!(
-                ("key".to_string(), JsonAST::JString("value".to_string())),
-                ("key-n".to_string(), JsonAST::JNumber(101.into())),
+            JsonAST::Object(vec!(
+                ("key".to_string(), JsonAST::String("value".to_string())),
+                ("key-n".to_string(), JsonAST::Number(101.into())),
                 (
                     "key-o".to_string(),
-                    JsonAST::JObject(vec!((
+                    JsonAST::Object(vec!((
                         "inner key".to_string(),
-                        JsonAST::JString("inner value".to_string())
+                        JsonAST::String("inner value".to_string())
                     )))
                 ),
                 (
                     "key-l".to_string(),
-                    JsonAST::JArray(vec!(JsonAST::JString("list value".to_string())))
+                    JsonAST::Array(vec!(JsonAST::String("list value".to_string())))
                 )
             ))
         )
@@ -251,11 +234,11 @@ mod tests {
         .unwrap();
         assert_eq!(
             result,
-            JsonAST::JObject(vec!(
-                ("key".to_string(), JsonAST::JString("value".to_string())),
-                ("key-n".to_string(), JsonAST::JNumber(101.into())),
-                ("key-o".to_string(), JsonAST::JObject(Vec::new())),
-                ("key-l".to_string(), JsonAST::JArray(Vec::new()))
+            JsonAST::Object(vec!(
+                ("key".to_string(), JsonAST::String("value".to_string())),
+                ("key-n".to_string(), JsonAST::Number(101.into())),
+                ("key-o".to_string(), JsonAST::Object(Vec::new())),
+                ("key-l".to_string(), JsonAST::Array(Vec::new()))
             ))
         )
     }
@@ -274,6 +257,21 @@ mod tests {
         )
         .err()
         .unwrap();
-        assert!(result.contains("Unexpected tokens found after whole Json was defined"))
+        assert_eq!(
+            result,
+            ParserError::UnexpectedTokenAfterEOF(Token::String("aloha".to_string()))
+        )
+    }
+
+    #[test]
+    fn start_of_json_and_end_of_input_should_fail() {
+        let result = parse(
+            "
+            {
+        ",
+        )
+        .err()
+        .unwrap();
+        assert_eq!(result, ParserError::UnexpectedEOF)
     }
 }

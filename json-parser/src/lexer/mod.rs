@@ -1,41 +1,8 @@
-use std::fmt::Formatter;
+pub(crate) use crate::lexer::domain::*;
 
-#[derive(Debug, Clone, PartialEq)]
-pub enum Token {
-    Null,
-    True,
-    False,
-    Number(f64),
-    TString(String),
-    LeftBrace,
-    RightBrace,
-    LeftBracket,
-    RightBracket,
-    Comma,
-    Colon,
-    EndOfFile,
-}
+pub mod domain;
 
-impl std::fmt::Display for Token {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Token::Null => write!(f, "null"),
-            Token::True => write!(f, "true"),
-            Token::False => write!(f, "false"),
-            Token::Number(n) => write!(f, "Number({})", n),
-            Token::TString(s) => write!(f, "String({})", s),
-            Token::LeftBrace => write!(f, "{{"),
-            Token::RightBrace => write!(f, "}}"),
-            Token::LeftBracket => write!(f, "["),
-            Token::RightBracket => write!(f, "]"),
-            Token::Comma => write!(f, ","),
-            Token::Colon => write!(f, ":"),
-            Token::EndOfFile => write!(f, "EOF"),
-        }
-    }
-}
-
-pub fn tokenize(input: &str) -> Result<Vec<Token>, String> {
+pub fn tokenize(input: &str) -> Result<Vec<Token>> {
     let input: Vec<char> = input.trim().chars().collect();
     let mut tokens = Vec::new();
 
@@ -55,7 +22,7 @@ pub fn tokenize(input: &str) -> Result<Vec<Token>, String> {
             'f' => i = tokenize_false(&input, &mut tokens, i)?,
             ' ' | '\n' | '\t' | '\r' => i = skip_whitespaces(&input, i),
             '"' => i = tokenize_string(&input, &mut tokens, i)?,
-            str => return Err(format!("Unrecognised token {:}", str)),
+            _ => return Err(TokenizerError::InvalidCharacter(c)),
         }
         i += 1;
     }
@@ -63,42 +30,48 @@ pub fn tokenize(input: &str) -> Result<Vec<Token>, String> {
     Ok(tokens)
 }
 
-fn tokenize_number(input: &[char], tokens: &mut Vec<Token>, i: usize) -> Result<usize, String> {
+fn tokenize_number(input: &[char], tokens: &mut Vec<Token>, i: usize) -> Result<usize> {
     let mut i = i;
     let mut tmp = String::new();
     while input[i].is_ascii_digit() || input[i] == '.' {
         tmp.push(input[i]);
         i += 1;
     }
-    let num = tmp.parse::<f64>().expect("It was expecting a number");
+    let num = tmp.parse::<f64>()?;
     tokens.push(Token::Number(num));
     Ok(i - 1)
 }
 
-fn tokenize_null(input: &[char], tokens: &mut Vec<Token>, i: usize) -> Result<usize, String> {
+fn tokenize_null(input: &[char], tokens: &mut Vec<Token>, i: usize) -> Result<usize> {
     if input[i..i + 4] == ['n', 'u', 'l', 'l'] {
         tokens.push(Token::Null);
         Ok(i + 3)
     } else {
-        Err("Expected null but failed".to_string())
+        Err(TokenizerError::ExpectedNull)
     }
 }
 
-fn tokenize_true(input: &[char], tokens: &mut Vec<Token>, i: usize) -> Result<usize, String> {
+fn tokenize_true(input: &[char], tokens: &mut Vec<Token>, i: usize) -> Result<usize> {
     if input[i..i + 4] == ['t', 'r', 'u', 'e'] {
         tokens.push(Token::True);
         Ok(i + 3)
     } else {
-        Err("Expected true but failed".to_string())
+        Err(TokenizerError::ParseBooleanError(
+            true,
+            input[i..i + 4].iter().collect::<String>(),
+        ))
     }
 }
 
-fn tokenize_false(input: &[char], tokens: &mut Vec<Token>, i: usize) -> Result<usize, String> {
+fn tokenize_false(input: &[char], tokens: &mut Vec<Token>, i: usize) -> Result<usize> {
     if input[i..i + 5] == ['f', 'a', 'l', 's', 'e'] {
         tokens.push(Token::False);
         Ok(i + 4)
     } else {
-        Err("Expected false but failed".to_string())
+        Err(TokenizerError::ParseBooleanError(
+            false,
+            input[i..i + 5].iter().collect::<String>(),
+        ))
     }
 }
 
@@ -114,7 +87,7 @@ fn skip_whitespaces(input: &[char], i: usize) -> usize {
     i - 1
 }
 
-fn tokenize_string(input: &[char], tokens: &mut Vec<Token>, i: usize) -> Result<usize, String> {
+fn tokenize_string(input: &[char], tokens: &mut Vec<Token>, i: usize) -> Result<usize> {
     let mut i = i + 1;
     let mut str = String::new();
     while i < input.len() && input[i] != '"' {
@@ -122,16 +95,19 @@ fn tokenize_string(input: &[char], tokens: &mut Vec<Token>, i: usize) -> Result<
         i += 1;
     }
     if i < input.len() && input[i] == '"' {
-        tokens.push(Token::TString(str));
+        tokens.push(Token::String(str));
         Ok(i)
     } else {
-        Err("Expected \" but not found".to_string())
+        Err(TokenizerError::MismatchTokenExpectation(
+            '"',
+            input[input.len() - 1],
+        ))
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::lexer::{Token, tokenize};
+    use crate::lexer::{Token, TokenizerError, tokenize};
 
     #[test]
     fn tokenize_should_correctly_deal_with_known_tokens() {
@@ -141,12 +117,12 @@ mod tests {
             result,
             vec!(
                 Token::LeftBrace,
-                Token::TString("foobar".to_string()),
+                Token::String("foobar".to_string()),
                 Token::Colon,
                 Token::LeftBracket,
-                Token::TString("apple".to_string()),
+                Token::String("apple".to_string()),
                 Token::Comma,
-                Token::TString("banana".to_string()),
+                Token::String("banana".to_string()),
                 Token::RightBracket,
                 Token::Comma,
                 Token::True,
@@ -181,23 +157,23 @@ mod tests {
             result,
             vec!(
                 Token::LeftBrace,
-                Token::TString("foo".to_string()),
+                Token::String("foo".to_string()),
                 Token::Colon,
                 Token::Number(123.into()),
                 Token::Comma,
-                Token::TString("bar".to_string()),
+                Token::String("bar".to_string()),
                 Token::Colon,
-                Token::TString("spectacular".to_string()),
+                Token::String("spectacular".to_string()),
                 Token::Comma,
-                Token::TString("baz".to_string()),
+                Token::String("baz".to_string()),
                 Token::Colon,
                 Token::Null,
                 Token::Comma,
-                Token::TString("b1".to_string()),
+                Token::String("b1".to_string()),
                 Token::Colon,
                 Token::True,
                 Token::Comma,
-                Token::TString("b2".to_string()),
+                Token::String("b2".to_string()),
                 Token::Colon,
                 Token::False,
                 Token::RightBrace,
@@ -207,13 +183,13 @@ mod tests {
 
     #[test]
     fn tokenize_should_fail_if_unclosed_quote() {
-        let result = tokenize("{\"foobar}").err().unwrap();
-        assert!(result.contains("Expected \" but not found"))
+        let error = tokenize("{\"foobar}").err().unwrap();
+        assert_eq!(error, TokenizerError::MismatchTokenExpectation('"', '}'));
     }
 
     #[test]
     fn tokenize_should_fail_if_unknown_token() {
-        let result = tokenize("?").err().unwrap();
-        assert!(result.contains("Unrecognised token"))
+        let error = tokenize("?").err().unwrap();
+        assert_eq!(error, TokenizerError::InvalidCharacter('?'));
     }
 }
