@@ -1,5 +1,5 @@
-use std::net::SocketAddr;
-use std::sync::Arc;
+use std::{net::SocketAddr, sync::Arc};
+
 use tokio::sync::RwLock;
 
 #[derive(Debug)]
@@ -58,9 +58,9 @@ impl Targets {
 
 #[cfg(test)]
 mod test {
+    use std::{net::SocketAddr, sync::Arc};
+
     use crate::domain::models::Targets;
-    use std::net::SocketAddr;
-    use std::sync::Arc;
 
     #[test]
     fn targets_new_should_init_struct_correctly() {

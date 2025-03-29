@@ -1,7 +1,9 @@
-use crate::lexer::{Token, tokenize};
-use crate::parser::domain::JsonAST;
-use domain::ParserError;
-use domain::Result;
+use domain::{ParserError, Result};
+
+use crate::{
+    lexer::{Token, tokenize},
+    parser::domain::JsonAST,
+};
 
 mod domain;
 
@@ -113,9 +115,10 @@ pub fn parse(input: &str) -> Result<JsonAST> {
 
 #[cfg(test)]
 mod tests {
-    use crate::lexer::Token;
-    use crate::parser::domain::ParserError;
-    use crate::parser::{JsonAST, parse};
+    use crate::{
+        lexer::Token,
+        parser::{JsonAST, domain::ParserError, parse},
+    };
 
     #[test]
     fn invalid_empty_json_should_fail() {

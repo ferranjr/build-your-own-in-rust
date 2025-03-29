@@ -1,7 +1,7 @@
+use std::{io, io::Write};
+
 use anyhow::{Context, Result};
 use json_parser::parser::parse;
-use std::io;
-use std::io::Write;
 
 fn read_input() -> Result<String> {
     let mut raw_input = String::new();

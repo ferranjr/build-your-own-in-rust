@@ -1,5 +1,4 @@
-use std::fmt::Formatter;
-use std::num::ParseFloatError;
+use std::{fmt::Formatter, num::ParseFloatError};
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Token {

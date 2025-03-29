@@ -1,5 +1,6 @@
-use anyhow::Context;
 use std::env;
+
+use anyhow::Context;
 
 const MONGO_SHORT_URLS_DB: &str = "MONGO_SHORT_URLS_DB";
 const MONGO_SHORT_URLS_DB_USERNAME: &str = "MONGO_SHORT_URLS_DB_USERNAME";

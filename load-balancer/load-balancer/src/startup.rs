@@ -1,12 +1,11 @@
-use crate::domain::models::Targets;
-use crate::proxy::pipe_through;
-use hyper::server::conn::http1;
-use hyper::service::service_fn;
-use hyper_util::rt::TokioIo;
 use std::sync::Arc;
-use tokio::net::TcpListener;
-use tokio::sync::Mutex;
+
+use hyper::{server::conn::http1, service::service_fn};
+use hyper_util::rt::TokioIo;
+use tokio::{net::TcpListener, sync::Mutex};
 use tracing::{error, info};
+
+use crate::{domain::models::Targets, proxy::pipe_through};
 
 pub async fn run(
     tcp_listener: TcpListener,

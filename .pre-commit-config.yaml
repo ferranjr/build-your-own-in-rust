@@ -4,7 +4,10 @@ repos:
       - id: rustfmt
         name: rustfmt
         description: Check if all files follow the rustfmt style
-        entry: cargo fmt --all -- --check --color always
+        entry: cargo +nightly fmt
+        args:
+          - --all
+          - --check
         language: system
         pass_filenames: false
       - id: clippy
@@ -12,6 +15,34 @@ repos:
         description: Lint rust sources
         entry: cargo clippy
         language: system
-        args: ["--", "-D", "warnings"]
+        args:
+          - --
+          - -D
+          - warnings
         types: [rust]
+        pass_filenames: false
+      - id: load-balancer-rustfmt
+        name: load-balancer-rustfmt
+        description: Check if all files follow the rustfmt style
+        entry: cargo +nightly fmt
+        args:
+          - --manifest-path
+          - load-balancer/Cargo.toml
+          - --all
+          - --check
+        verbose: true
+        language: system
+        pass_filenames: false
+      - id: load-balancer-clippy
+        name: load-balancer-clippy
+        description: Lint rust sources
+        entry: cargo clippy
+        language: system
+        args:
+          - --manifest-path
+          - load-balancer/Cargo.toml
+          - --
+          - -D
+          - warnings
+        types: [ rust ]
         pass_filenames: false

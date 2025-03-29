@@ -1,9 +1,12 @@
-use crate::domain::models::{Server, Targets};
-use std::sync::Arc;
-use std::time::Duration;
-use tokio::sync::{Mutex, RwLock};
-use tokio::time;
+use std::{sync::Arc, time::Duration};
+
+use tokio::{
+    sync::{Mutex, RwLock},
+    time,
+};
 use tracing::{error, info};
+
+use crate::domain::models::{Server, Targets};
 
 pub struct HealthChecker {}
 

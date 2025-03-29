@@ -1,7 +1,7 @@
+use std::{env, net::SocketAddr};
+
 use serde;
 use serde_aux::prelude::deserialize_number_from_string;
-use std::env;
-use std::net::SocketAddr;
 
 #[derive(serde::Deserialize, Clone)]
 pub struct Settings {

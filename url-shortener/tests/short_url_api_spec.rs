@@ -1,18 +1,15 @@
-use mongodb::bson::doc;
-use mongodb::options::IndexOptions;
-use mongodb::{Client, IndexModel};
+use std::net::TcpListener;
+
+use mongodb::{Client, IndexModel, bson::doc, options::IndexOptions};
 use nanoid::nanoid;
 use serde_json::json;
-use std::net::TcpListener;
-use testcontainers::core::IntoContainerPort;
-use testcontainers::runners::AsyncRunner;
-use testcontainers::{ContainerRequest, ImageExt};
+use testcontainers::{ContainerRequest, ImageExt, core::IntoContainerPort, runners::AsyncRunner};
 use testcontainers_modules::mongo::Mongo;
-use url_shortener::domain::urls::models::short_url::ShortUrl;
-use url_shortener::domain::urls::service::ServiceConfig;
-use url_shortener::inbound::http::HttpServer;
-use url_shortener::inbound::http::handlers::short_urls::CreateShortUrlResponse;
-use url_shortener::outbound::mongo::{MongoClient, MongoDatabase};
+use url_shortener::{
+    domain::urls::{models::short_url::ShortUrl, service::ServiceConfig},
+    inbound::http::{HttpServer, handlers::short_urls::CreateShortUrlResponse},
+    outbound::mongo::{MongoClient, MongoDatabase},
+};
 
 #[derive(Debug)]
 struct TestApp {

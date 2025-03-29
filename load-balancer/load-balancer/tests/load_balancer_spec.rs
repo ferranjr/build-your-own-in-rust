@@ -1,13 +1,8 @@
-use load_balancer::domain::models::Targets;
-use load_balancer::healthchecks::healthchecker::HealthChecker;
-use load_balancer::startup;
+use std::{net::SocketAddr, sync::Arc, time::Duration};
+
+use load_balancer::{domain::models::Targets, healthchecks::healthchecker::HealthChecker, startup};
 use reqwest::Client;
-use std::net::SocketAddr;
-use std::sync::Arc;
-use std::time::Duration;
-use tokio::net::TcpListener;
-use tokio::sync::Mutex;
-use tokio::time;
+use tokio::{net::TcpListener, sync::Mutex, time};
 use tracing::info;
 
 #[derive(Debug)]
@@ -24,6 +19,7 @@ impl TestApp {
             .await
             .expect("Failed to execute request")
     }
+
     async fn get_status(&self) -> reqwest::Response {
         self.get_path("/private/status".to_string()).await
     }
