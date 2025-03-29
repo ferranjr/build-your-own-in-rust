@@ -14,20 +14,20 @@ path = "src/bin/server/main.rs"
 [dependencies]
 anyhow = { workspace = true }
 tokio = { workspace = true }
-nanoid = "0.4.0"
-thiserror = "2.0.12"
-url = { version = "2.5.4", features = ["serde"] }
-serde = { version = "1.0.219" }
-serde_json = "1.0.140"
-mongodb = { version = "3.2.2", features = ["rustls-tls"] }
-actix-web = "4.10.2"
-env_logger = "0.11.7"
-reqwest = { version = "0.12.14", features = ["json"] }
-tracing = "0.1.41"
-tracing-subscriber = "0.3.19"
+nanoid = { workspace = true }
+thiserror = { workspace = true }
+url = { workspace = true, features = ["serde"] }
+serde = { workspace = true }
+serde_json = { workspace = true }
+mongodb = { workspace = true, features = ["rustls-tls"] }
+actix-web = { workspace = true }
+env_logger = { workspace = true }
+reqwest = { workspace = true, features = ["json"] }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
 
 [dev-dependencies]
-mockall = "0.13.1"
-testcontainers = "0.23.3"
-testcontainers-modules = { version = "0.11.6", features = ["mongo"] }
+mockall = { workspace = true }
+testcontainers = { workspace = true }
+testcontainers-modules = { workspace = true }
 
