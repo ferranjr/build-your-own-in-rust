@@ -57,7 +57,7 @@ jobs:
           toolchain: nightly
           components: rustfmt
       - name: Enforce formatting
-        run: cargo fmt --check
+        run: cargo +nightly fmt --check
         working-directory: ./load-balancer
 
   # `clippy` container job
