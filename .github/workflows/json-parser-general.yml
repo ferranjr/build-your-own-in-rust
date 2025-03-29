@@ -54,10 +54,10 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
         with:
-          # Specific to dtolnay/rust-toolchain: Comma-separated string of additional components to install
+          toolchain: nightly
           components: rustfmt
       - name: Enforce formatting
-        run: cargo +nightly fmt --check
+        run: cargo fmt --check
         working-directory: ./json-parser
 
   # `clippy` container job
