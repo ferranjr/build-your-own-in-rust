@@ -57,7 +57,7 @@ jobs:
           # Specific to dtolnay/rust-toolchain: Comma-separated string of additional components to install
           components: rustfmt
       - name: Enforce formatting
-        run: cargo fmt --check
+        run: cargo +nightly fmt --check
         working-directory: ./json-parser
 
   # `clippy` container job
