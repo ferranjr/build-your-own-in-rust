@@ -1,8 +1,13 @@
 use http_body_util::{BodyExt, Empty, Full, combinators::BoxBody};
-use hyper::body::Bytes;
-use hyper::server::conn::http1;
-use hyper::service::service_fn;
-use hyper::{Method, Request, Response, StatusCode};
+use hyper::{
+    Method,
+    Request,
+    Response,
+    StatusCode,
+    body::Bytes,
+    server::conn::http1,
+    service::service_fn,
+};
 use hyper_util::rt::TokioIo;
 use tokio::net::TcpListener;
 use tracing::{error, info, instrument};

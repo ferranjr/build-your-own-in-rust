@@ -1,17 +1,29 @@
-use crate::domain::urls::models::short_url::{
-    CreateShortUrlRequest, RepositoryShortUrlError, ShortUrlId, ShortUrlResponse,
+use std::fmt::Formatter;
+
+use actix_web::{
+    HttpResponse,
+    ResponseError,
+    http::{StatusCode, header::LOCATION},
+    web,
 };
-use crate::domain::urls::ports::{UrlsRepository, UrlsService};
-use crate::domain::urls::service::Service;
-use crate::inbound::http::handlers::short_urls::CreateShortUrlError::UnexpectedError;
-use actix_web::http::StatusCode;
-use actix_web::http::header::LOCATION;
-use actix_web::{HttpResponse, ResponseError, web};
 use anyhow::anyhow;
 use serde::{Deserialize, Serialize};
-use std::fmt::Formatter;
 use tracing::instrument;
 use url::Url;
+
+use crate::{
+    domain::urls::{
+        models::short_url::{
+            CreateShortUrlRequest,
+            RepositoryShortUrlError,
+            ShortUrlId,
+            ShortUrlResponse,
+        },
+        ports::{UrlsRepository, UrlsService},
+        service::Service,
+    },
+    inbound::http::handlers::short_urls::CreateShortUrlError::UnexpectedError,
+};
 
 #[derive(thiserror::Error)]
 pub enum CreateShortUrlError {

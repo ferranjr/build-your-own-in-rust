@@ -1,7 +1,8 @@
+use std::fmt::{Display, Formatter};
+
 use mongodb::error::Error;
 use nanoid::nanoid;
 use serde::{Deserialize, Serialize};
-use std::fmt::{Display, Formatter};
 use thiserror::Error;
 use url::{ParseError, Url};
 

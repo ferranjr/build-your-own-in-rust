@@ -1,12 +1,11 @@
 pub mod handlers;
 
-use crate::domain::urls::ports::UrlsRepository;
-use crate::domain::urls::service::Service;
-use actix_web::dev::Server;
-use actix_web::web::Data;
-use actix_web::{App, web};
 use std::net::TcpListener;
+
+use actix_web::{App, dev::Server, web, web::Data};
 use tracing::info;
+
+use crate::domain::urls::{ports::UrlsRepository, service::Service};
 
 pub struct HttpServer {
     server: Server,

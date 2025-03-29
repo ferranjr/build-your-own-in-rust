@@ -1,10 +1,12 @@
-use load_balancer::configuration::get_configuration;
-use load_balancer::domain::models::Targets;
-use load_balancer::healthchecks::healthchecker::HealthChecker;
-use load_balancer::startup;
 use std::sync::Arc;
-use tokio::net::TcpListener;
-use tokio::sync::Mutex;
+
+use load_balancer::{
+    configuration::get_configuration,
+    domain::models::Targets,
+    healthchecks::healthchecker::HealthChecker,
+    startup,
+};
+use tokio::{net::TcpListener, sync::Mutex};
 use tracing_subscriber::EnvFilter;
 
 #[tokio::main]

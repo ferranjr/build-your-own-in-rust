@@ -1,8 +1,15 @@
-use crate::domain::urls::models::short_url::{
-    CreateShortUrlRequest, RepositoryShortUrlError, ShortUrl, ShortUrlId, ShortUrlResponse,
-};
-use crate::domain::urls::ports::{UrlsRepository, UrlsService};
 use url::Url;
+
+use crate::domain::urls::{
+    models::short_url::{
+        CreateShortUrlRequest,
+        RepositoryShortUrlError,
+        ShortUrl,
+        ShortUrlId,
+        ShortUrlResponse,
+    },
+    ports::{UrlsRepository, UrlsService},
+};
 
 #[derive(Debug, Clone)]
 pub struct Service<R>
@@ -102,13 +109,20 @@ impl ServiceConfig {
 
 #[cfg(test)]
 mod tests {
-    use crate::domain::urls::models::short_url::{
-        CreateShortUrlRequest, RepositoryShortUrlError, ShortUrl, ShortUrlId, ShortUrlResponse,
-    };
-    use crate::domain::urls::ports::{UrlsRepository, UrlsService};
-    use crate::domain::urls::service::{Service, ServiceConfig};
     use mockall::mock;
     use url::Url;
+
+    use crate::domain::urls::{
+        models::short_url::{
+            CreateShortUrlRequest,
+            RepositoryShortUrlError,
+            ShortUrl,
+            ShortUrlId,
+            ShortUrlResponse,
+        },
+        ports::{UrlsRepository, UrlsService},
+        service::{Service, ServiceConfig},
+    };
 
     mock! {
         pub MockUrlsRepository { }

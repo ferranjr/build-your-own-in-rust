@@ -1,6 +1,8 @@
-use crate::lexer::{Token, TokenizerError};
 use std::fmt::Formatter;
+
 use tracing::error;
+
+use crate::lexer::{Token, TokenizerError};
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum JsonAST {

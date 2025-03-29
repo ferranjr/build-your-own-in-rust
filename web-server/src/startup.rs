@@ -1,8 +1,14 @@
-use crate::domain::http_request::{HttpRequest, Method};
-use crate::domain::http_response::{HttpResponse, StatusCodes};
 use std::path::Path;
-use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
-use tokio::net::{TcpListener, TcpStream};
+
+use tokio::{
+    io::{AsyncBufReadExt, AsyncWriteExt, BufReader},
+    net::{TcpListener, TcpStream},
+};
+
+use crate::domain::{
+    http_request::{HttpRequest, Method},
+    http_response::{HttpResponse, StatusCodes},
+};
 
 pub async fn run_server(listener: TcpListener) -> std::io::Result<()> {
     let address = listener.local_addr()?;

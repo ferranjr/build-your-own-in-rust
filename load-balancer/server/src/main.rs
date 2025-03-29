@@ -1,6 +1,6 @@
+use std::{env, net::SocketAddr};
+
 use server::startup;
-use std::env;
-use std::net::SocketAddr;
 use tokio::net::TcpListener;
 use tracing::info;
 use tracing_subscriber::EnvFilter;

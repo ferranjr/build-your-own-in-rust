@@ -1,9 +1,12 @@
-use env_logger::Env;
 use std::net::TcpListener;
-use url_shortener::config::Config;
-use url_shortener::domain::urls::service::{Service, ServiceConfig};
-use url_shortener::inbound::http::HttpServer;
-use url_shortener::outbound::mongo::{MongoClient, MongoDatabase};
+
+use env_logger::Env;
+use url_shortener::{
+    config::Config,
+    domain::urls::service::{Service, ServiceConfig},
+    inbound::http::HttpServer,
+    outbound::mongo::{MongoClient, MongoDatabase},
+};
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {

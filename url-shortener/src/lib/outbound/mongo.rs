@@ -1,9 +1,11 @@
-use crate::domain::urls::models::short_url::{RepositoryShortUrlError, ShortUrl, ShortUrlId};
-use crate::domain::urls::ports::UrlsRepository;
-use mongodb::bson::doc;
-use mongodb::{Client, Collection, Database};
+use mongodb::{Client, Collection, Database, bson::doc};
 use tracing::instrument;
 use url::Url;
+
+use crate::domain::urls::{
+    models::short_url::{RepositoryShortUrlError, ShortUrl, ShortUrlId},
+    ports::UrlsRepository,
+};
 
 #[derive(Debug, Clone)]
 pub struct MongoClient {

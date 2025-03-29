@@ -1,8 +1,14 @@
-use crate::domain::urls::models::short_url::{
-    CreateShortUrlRequest, RepositoryShortUrlError, ShortUrl, ShortUrlId, ShortUrlResponse,
-};
 use std::future::Future;
+
 use url::Url;
+
+use crate::domain::urls::models::short_url::{
+    CreateShortUrlRequest,
+    RepositoryShortUrlError,
+    ShortUrl,
+    ShortUrlId,
+    ShortUrlResponse,
+};
 
 pub trait UrlsService: Clone + Send + Sync + 'static {
     fn create_short_url(

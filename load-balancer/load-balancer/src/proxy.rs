@@ -1,9 +1,8 @@
-use http_body_util::{BodyExt, combinators::BoxBody};
-use hyper::body::Bytes;
-use hyper::client::conn::http1::Builder;
-use hyper::{Request, Response};
-use hyper_util::rt::TokioIo;
 use std::net::SocketAddr;
+
+use http_body_util::{BodyExt, combinators::BoxBody};
+use hyper::{Request, Response, body::Bytes, client::conn::http1::Builder};
+use hyper_util::rt::TokioIo;
 use tokio::net::TcpStream;
 use tracing::{error, instrument};
 
