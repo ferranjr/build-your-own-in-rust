@@ -8,9 +8,9 @@ on:
   pull_request:
     paths:
       - 'url-shortener/**'
-  workflow_dispatch:
-    paths:
-      - 'url-shortener/**'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - 'rust-toolchain.toml'
 
 env:
   CARGO_TERM_COLOR: always

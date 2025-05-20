@@ -8,9 +8,9 @@ on:
   pull_request:
     paths:
       - 'json-parser/**'
-  workflow_dispatch:
-    paths:
-      - 'json-parser/**'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - 'rust-toolchain.toml'
 
 env:
   CARGO_TERM_COLOR: always
