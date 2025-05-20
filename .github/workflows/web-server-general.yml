@@ -8,9 +8,9 @@ on:
   pull_request:
     paths:
       - 'web-server/**'
-  workflow_dispatch:
-    paths:
-      - 'web-server/**'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - 'rust-toolchain.toml'
 
 env:
   CARGO_TERM_COLOR: always

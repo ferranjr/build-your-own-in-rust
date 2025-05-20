@@ -6,9 +6,9 @@ on:
     paths:
       - 'json-parser/**/Cargo.toml'
       - 'json-parser/**/Cargo.lock'
-  workflow_dispatch:
-    paths:
-      - 'json-parser/**'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - 'rust-toolchain.toml'
 jobs:
   security_audit:
     runs-on: ubuntu-latest

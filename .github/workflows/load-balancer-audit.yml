@@ -6,9 +6,7 @@ on:
     paths:
       - 'load-balancer/**/Cargo.toml'
       - 'load-balancer/**/Cargo.lock'
-  workflow_dispatch:
-    paths:
-      - 'load-balancer/**'
+      - 'load-balancer/rust-toolchain.toml'
 jobs:
   security_audit:
     runs-on: ubuntu-latest

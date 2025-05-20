@@ -6,9 +6,9 @@ on:
     paths:
       - 'web-server/**/Cargo.toml'
       - 'web-server/**/Cargo.lock'
-  workflow_dispatch:
-    paths:
-      - 'web-server/**'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - 'rust-toolchain.toml'
 jobs:
   security_audit:
     runs-on: ubuntu-latest
