@@ -45,7 +45,7 @@ async fn request_handler(
     name: &str,
 ) -> Result<Response<BoxBody<Bytes, hyper::Error>>, hyper::Error> {
     match (req.method(), req.uri().path()) {
-        (&Method::GET, "/") => Ok(Response::new(full(format!("Hello from server {}\n", name)))),
+        (&Method::GET, "/") => Ok(Response::new(full(format!("Hello from server {name}\n")))),
         (&Method::GET, "/private/status") => Ok(Response::new(full("OK\n"))),
         (_, _) => {
             let mut not_found = Response::new(empty());

@@ -87,7 +87,7 @@ mod test {
             .expect("Failed to parse socket addr");
         let mut targets = Targets::new(vec![address1, address2]);
         for s in targets.servers.iter() {
-            let server = Arc::clone(&s);
+            let server = Arc::clone(s);
             server.write().await.healthy = true;
         }
 

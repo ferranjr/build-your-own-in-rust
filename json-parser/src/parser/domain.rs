@@ -1,7 +1,5 @@
 use std::fmt::Formatter;
 
-use tracing::error;
-
 use crate::lexer::{Token, TokenizerError};
 
 #[derive(Debug, Clone, PartialEq)]
@@ -17,11 +15,11 @@ pub enum JsonAST {
 impl std::fmt::Display for JsonAST {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            JsonAST::Object(elements) => write!(f, "{{ {:?} }}", elements),
+            JsonAST::Object(elements) => write!(f, "{{ {elements:?} }}"),
             JsonAST::Array(_) => write!(f, "[]"),
-            JsonAST::String(s) => write!(f, "\"{}\"", s),
+            JsonAST::String(s) => write!(f, "\"{s}\""),
             JsonAST::Boolean(b) => write!(f, "{}", if *b { "true" } else { "false" }),
-            JsonAST::Number(n) => write!(f, "{}", n),
+            JsonAST::Number(n) => write!(f, "{n}"),
             JsonAST::Null => write!(f, "null"),
         }
     }

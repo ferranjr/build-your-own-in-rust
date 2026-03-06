@@ -10,19 +10,19 @@ members = [
 edition = "2024"
 
 [workspace.dependencies]
-anyhow = "1.0.98"
-thiserror = "2.0.12"
-tracing = "0.1.41"
-tracing-subscriber = "0.3.19"
-tokio = { version = "1.45.1", features = ["full"] }
+anyhow = "1.0.102"
+thiserror = "2.0.18"
+tracing = "0.1.44"
+tracing-subscriber = "0.3.22"
+tokio = { version = "1.50.0", features = ["full"] }
 nanoid = "0.4.0"
-url = { version = "2.5.4", features = ["serde"] }
-serde = { version = "1.0.219" }
-serde_json = "1.0.140"
-mongodb = { version = "3.2.3", features = ["rustls-tls"] }
-actix-web = "4.11.0"
-env_logger = "0.11.7"
-reqwest = { version = "0.12.19", features = ["json"] }
+url = { version = "2.5.8", features = ["serde"] }
+serde = { version = "1.0.228" }
+serde_json = "1.0.149"
+mongodb = { version = "3.5.1", features = ["rustls-tls"] }
+actix-web = "4.13.0"
+env_logger = "0.11.9"
+reqwest = { version = "0.12.28", features = ["json"] }
 mockall = "0.13.1"
 testcontainers = "0.23.3"
 testcontainers-modules = { version = "0.11.6", features = ["mongo"] }

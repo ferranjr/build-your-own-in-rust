@@ -21,8 +21,8 @@ pub fn repl() {
         let expr = read_input().unwrap();
 
         match parse(expr.as_ref()) {
-            Ok(val) => println!(" ==> {}", val),
-            Err(error) => eprintln!("==> Error: {}", error),
+            Ok(val) => println!(" ==> {val}"),
+            Err(error) => eprintln!("==> Error: {error}"),
         };
     }
 }

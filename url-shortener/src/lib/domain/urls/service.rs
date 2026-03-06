@@ -386,11 +386,9 @@ mod tests {
 
         let service_under_test = Service::new(mock_urls_repository, service_config());
 
-        let result = service_under_test
+        service_under_test
             .delete_short_url(short_url.key().to_owned())
             .await
             .unwrap();
-
-        assert_eq!(result, ());
     }
 }
