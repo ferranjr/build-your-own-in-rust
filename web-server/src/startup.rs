@@ -48,7 +48,7 @@ async fn handle_request(method: Method, path: String) -> std::io::Result<HttpRes
 }
 
 async fn load_file(path: String) -> std::io::Result<String> {
-    let final_path = std::env::current_dir()?.join(Path::new(&format!("www{}", path)));
+    let final_path = std::env::current_dir()?.join(Path::new(&format!("www{path}")));
     if final_path.is_file() {
         tokio::fs::read_to_string(final_path).await
     } else {

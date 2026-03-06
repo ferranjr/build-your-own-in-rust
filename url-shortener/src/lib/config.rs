@@ -28,8 +28,7 @@ impl Config {
         let mongo_base_url = load_env(MONGO_BASE_URL)?;
         let mongo_port = load_env(MONGO_PORT)?.parse::<u16>()?;
         let mongo_uri = format!(
-            "mongodb://{}:{}@{}:{}/{}",
-            mongo_username, mongo_password, mongo_base_url, mongo_port, mongo_database
+            "mongodb://{mongo_username}:{mongo_password}@{mongo_base_url}:{mongo_port}/{mongo_database}"
         );
 
         Ok(Config {
@@ -42,5 +41,5 @@ impl Config {
 }
 
 fn load_env(key: &str) -> anyhow::Result<String> {
-    env::var(key).with_context(|| format!("Missing environment variable {}", key))
+    env::var(key).with_context(|| format!("Missing environment variable {key}"))
 }

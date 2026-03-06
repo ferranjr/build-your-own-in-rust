@@ -28,7 +28,7 @@ async fn set_up_database(mongo_uri: &str) -> Result<TestMongo, Box<dyn std::erro
     let mongo_db_name: String = format!("short_urls_db_{}", nanoid!(6));
     let col_name: &str = "short_urls";
     let database = client.database(mongo_db_name.as_str());
-    let _ = database.create_collection(col_name).await.unwrap();
+    database.create_collection(col_name).await.unwrap();
     let collection = database.collection::<ShortUrl>(col_name);
 
     let index_long_url = IndexModel::builder()
@@ -74,7 +74,7 @@ async fn spawn_app(test_mongo: TestMongo) -> Result<TestApp, Box<dyn std::error:
     // Create HttpServer
     let http_server = HttpServer::new(urls_service, listener).await?;
 
-    let _ = tokio::spawn(http_server.run_until_stopped());
+    std::mem::drop(tokio::spawn(http_server.run_until_stopped()));
 
     Ok(TestApp { base_url })
 }
@@ -98,7 +98,7 @@ async fn healthcheck_should_be_ok() {
 
     //Act
     let response = client
-        .get(&format!("{}health_check", &test_app.base_url))
+        .get(format!("{}health_check", &test_app.base_url))
         .send()
         .await
         .expect("Failed to execute request");

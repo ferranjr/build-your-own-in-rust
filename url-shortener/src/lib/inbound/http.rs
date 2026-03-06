@@ -60,6 +60,7 @@ where
                 web::delete().to(handlers::short_urls::delete_short_url::<R>),
             )
     })
+    .workers(1)
     .listen(tcp_listener)?
     .run();
 

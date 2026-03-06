@@ -43,7 +43,7 @@ impl Display for StatusCodes {
             StatusCodes::NotFound => "404 Not Found",
             StatusCodes::InternalServerError => "500 Internal Server Error",
         };
-        write!(f, "{}", str)
+        write!(f, "{str}")
     }
 }
 

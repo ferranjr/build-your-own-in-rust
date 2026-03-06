@@ -14,7 +14,7 @@ async fn spawn_app() -> std::io::Result<TestApp> {
     let port = local_address.port();
 
     tokio::task::spawn(async move {
-        println!("Spinning up the test server at port {}", port);
+        println!("Spinning up the test server at port {port}");
         run_server(listener).await.expect("Unable to start server");
     });
 
